@@ -35,7 +35,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             val credentialManager = CredentialManager.create(context)
             
             // TODO: Replace with your actual Web Client ID from Google Cloud Console
-            val webClientId = "779721266536-an0g84psqn5b7fc8name2qbgajtpgih3.apps.googleusercontent.com"
+            val webClientId = "YOUR_GOOGLE_OAUTH_CLIENT_ID"
             
             val googleIdOption = GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(false)
