@@ -38,10 +38,12 @@ fun SetupScreen(
     onBackClick: () -> Unit = {}, 
     onComplete: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+
     SetupScreenContent(
         onBackClick = onBackClick,
         onSaveProfile = { name, country, dob, gender ->
-            viewModel.saveUserProfile(name, country, dob, gender, onComplete)
+            viewModel.saveUserProfile( name, country, dob, gender, onComplete)
         }
     )
 }
@@ -97,10 +99,10 @@ fun SetupScreenContent(
             color = Color.Black
         )
         
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         
         Text(
-            text = "Before that, we need to know some of your information.\nThis information will used to maximalize your personal experience.",
+            text = "Before that, we need to know some of your information.\nThis information will used to maximize your personal experience.",
             fontSize = 12.sp,
             color = Color.Gray,
             lineHeight = 20.sp

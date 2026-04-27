@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
     // 10.0.2.2 is the special IP that refers to your computer's localhost from the Emulator
-    private const val BASE_URL = "http://10.0.2.2/index.php/"
+    private const val BASE_URL = "https://balihealth.me/"
 
     private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

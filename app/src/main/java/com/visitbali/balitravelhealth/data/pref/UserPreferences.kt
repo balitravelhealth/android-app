@@ -2,6 +2,7 @@ package com.visitbali.balitravelhealth.data.pref
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +23,7 @@ data class UserProfile(
 class UserPreferences(private val context: Context) {
 
     companion object {
+        private val ID_TOKEN_KEY = stringPreferencesKey("id_token")
         private val EMAIL = stringPreferencesKey("email")
         private val NAME = stringPreferencesKey("name")
         private val COUNTRY = stringPreferencesKey("country")
@@ -43,6 +45,10 @@ class UserPreferences(private val context: Context) {
         )
     }
 
+    suspend fun saveIdToken(token: String) {
+        context.dataStore.edit { it[ID_TOKEN_KEY] = token }
+    }
+    val idToken: Flow<String> = context.dataStore.data.map { it[ID_TOKEN_KEY] ?: ""}
     suspend fun saveEmail(email: String) {
         context.dataStore.edit { preferences ->
             preferences[EMAIL] = email

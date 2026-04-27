@@ -15,6 +15,7 @@ import com.visitbali.balitravelhealth.ui.theme.BaliTravelHealthTheme
 import com.visitbali.balitravelhealth.viewmodel.SplashViewModel
 import com.visitbali.balitravelhealth.ui.screens.LoginScreen
 import com.visitbali.balitravelhealth.ui.screens.SetupScreen
+import com.visitbali.balitravelhealth.ui.screens.SetupTravelScreen
 import com.visitbali.balitravelhealth.ui.screens.HomeScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.visitbali.balitravelhealth.viewmodel.SetupViewModel
@@ -66,8 +67,27 @@ class MainActivity : AppCompatActivity() {
                                     }
                                 },
                                 onComplete = {
-                                    navController.navigate("home") {
+                                    navController.navigate("travel_setup") {
                                         popUpTo("setup") { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
+                        composable("travel_setup") {
+                            SetupTravelScreen(
+                                onNext = {
+                                    navController.navigate("home") {
+                                        popUpTo("travel_setup") { inclusive = true }
+                                    }
+                                },
+                                onBack = {
+                                    navController.navigate(route = "setup") {
+                                        popUpTo(route = "travel_setup") {inclusive = true}
+                                    }
+                                },
+                                onSkip = {
+                                    navController.navigate("home") {
+                                        popUpTo("travel_setup") { inclusive = true }
                                     }
                                 }
                             )

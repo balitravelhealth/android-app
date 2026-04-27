@@ -73,30 +73,63 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 var userEmail = ""
                 var displayName = "User"
+                var idToken = ""
 
                 if (credential is GoogleIdTokenCredential) {
-                    userEmail = credential.id ?: "" // id is usually the email in GoogleIdTokenCredential
+                    userEmail = credential.id // id is usually the email in GoogleIdTokenCredential
                     displayName = credential.displayName ?: "User"
+                    idToken = credential.idToken
                 } else if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                     val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                     userEmail = googleIdTokenCredential.id
                     displayName = googleIdTokenCredential.displayName ?: "User"
+                    idToken = googleIdTokenCredential.idToken
                 }
 
                 if (userEmail.isNotEmpty()) {
                     userPreferences.saveEmail(userEmail)
+                    userPreferences.saveIdToken(idToken)
                     userPreferences.saveLoginStatus(true)
 
                     // Check with server if user exists
                     try {
-                        val response = apiService.getUserProfile(userEmail)
+                        val response = apiService.getUserProfile(
+                            authorization = "Bearer $idToken",
+                            email = userEmail)
                         if (response.success && response.data != null) {
                             // User exists on server, sync to local
                             userPreferences.saveUserProfile(response.data.copy(isLoggedIn = true, isRegistered = true))
                             _uiState.value = LoginUiState.Success(displayName, isNewUser = false)
                         } else {
-                            // User doesn't exist on server
+                            // User doesn't exist on server, ensure local state matches
+                            userPreferences.saveUserProfile(UserProfile(
+                                email = userEmail,
+                                name = "",
+                                country = "",
+                                dob = "",
+                                gender = "",
+                                isLoggedIn = true,
+                                isRegistered = false
+                            ))
                             _uiState.value = LoginUiState.Success(displayName, isNewUser = true)
+                        }
+                    } catch (e: retrofit2.HttpException) {
+                        if (e.code() == 401) {
+                            Log.d("LoginViewModel", "Server returned 401: User not found or unauthorized. Treating as new user.")
+                            userPreferences.saveUserProfile(UserProfile(
+                                email = userEmail,
+                                name = "",
+                                country = "",
+                                dob = "",
+                                gender = "",
+                                isLoggedIn = true,
+                                isRegistered = false
+                            ))
+                            _uiState.value = LoginUiState.Success(displayName, isNewUser = true)
+                        } else {
+                            Log.e("LoginViewModel", "HTTP Error ${e.code()}", e)
+                            val currentUser = userPreferences.userProfile.first()
+                            _uiState.value = LoginUiState.Success(displayName, isNewUser = !currentUser.isRegistered)
                         }
                     } catch (e: Exception) {
                         Log.e("LoginViewModel", "Server sync error", e)
