@@ -1,3 +1,151 @@
 <resources>
-    <string name="app_name">Bali Travel Health</string>
+    <string name="app_name" translatable="false">Bali Travel Health</string>
+
+    <!-- ===== COMMON / SHARED ===== -->
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_next">Next</string>
+    <string name="btn_back">Back</string>
+    <string name="btn_save">Save</string>
+    <string name="label_advice">Advice</string>
+    <string name="label_tools">Tools</string>
+    <string name="label_schedule">Schedule</string>
+    <string name="label_description">Description</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_close">Close</string>
+    <string name="picker_title_select_travel_dates">Select Travel Dates</string>
+
+    <!-- ===== LOGIN SCREEN ===== -->
+    <string name="cd_jalak_bali">Jalak Bali</string>
+    <string name="cd_logo">Logo</string>
+    <string name="cd_google_icon">Google Icon</string>
+    <string name="btn_continue_with_google">Continue With Google</string>
+    <string name="cd_apple_icon">Apple Icon</string>
+    <string name="btn_continue_with_apple">Continue With Apple</string>
+
+    <!-- ===== SETUP SCREEN ===== -->
+    <string name="setup_title">Let\'s get started!</string>
+    <string name="setup_subtitle">Before that, we need to know some of your information.\nThis information will be used to maximize your personal experience.</string>
+    <string name="setup_hint_name">Enter your name</string>
+    <string name="setup_placeholder_country">Country of Residence</string>
+    <string name="setup_placeholder_dob">Date of Birth</string>
+    <string name="setup_placeholder_gender">Gender</string>
+    <string name="setup_dialog_select_gender">Select Gender</string>
+    <string name="setup_gender_male">Male</string>
+    <string name="setup_gender_female">Female</string>
+
+    <!-- ===== SETUP TRAVEL SCREEN ===== -->
+    <string name="setup_travel_title">Ready to travel?</string>
+    <string name="setup_travel_subtitle">The seasonal forecast helps you plan your activities according to Bali\'s tropical climate patterns.</string>
+    <string name="setup_travel_placeholder_arrival">Arrival Date</string>
+    <string name="setup_travel_placeholder_departure">Departure Date</string>
+    <string name="setup_travel_hint_select_dates">Select dates to see seasonal outlook</string>
+    <string name="setup_travel_season_headline">Great!\nIt\'ll be %s during these days!</string>
+    <string name="setup_travel_btn_skip">Skip for now</string>
+
+    <!-- ===== HOME SCREEN ===== -->
+    <string name="home_welcome_back">Welcome back,</string>
+    <string name="home_headline_in_bali">Welcome to Bali!\nStay Healthy</string>
+    <string name="home_headline_not_in_bali">Keep Healthy\nWhile in Bali</string>
+    <string name="home_subtext_enjoy">Enjoy your stay in Bali!</string>
+    <string name="home_subtext_leaving">You\'ll be leaving Bali \nin %s</string>
+    <string name="home_subtext_going">You\'re going to Bali \nin %s</string>
+    <string name="home_card_pre_travel_title">Pre Travel</string>
+    <string name="home_card_pre_travel_desc">Prepare your health\nbefore traveling</string>
+    <string name="home_card_during_travel_title">During Travel</string>
+    <string name="home_card_during_travel_desc">Track your health\nwhile traveling</string>
+    <string name="home_card_post_travel_title">Post Travel</string>
+    <string name="home_card_post_travel_desc">Health check-up\nafter traveling</string>
+    <string name="home_card_nursing_care_title">Nursing Care</string>
+    <string name="home_card_nursing_care_desc">Get Nursing Care Service\nwhile traveling</string>
+    <string name="cd_avatar">Avatar</string>
+
+    <!-- ===== BOTTOM NAVIGATION ===== -->
+    <string name="nav_home">Home</string>
+    <string name="nav_guide">Guide</string>
+    <string name="nav_profile">Profile</string>
+    <string name="cd_profile">Profile</string>
+
+    <!-- ===== DURING TRAVEL SCREEN ===== -->
+    <string name="during_travel_title">Traveling</string>
+    <string name="during_travel_subtitle">Everything can happen. Don\'t worry</string>
+    <string name="during_travel_section_health_facility">Health Facility</string>
+    <string name="during_travel_section_life_support">Basic Life Support</string>
+    <string name="during_travel_facility_specialty">Speciality : %s</string>
+    <string name="during_travel_facility_open_24h">Open 24 hours : %s</string>
+    <string name="during_travel_facility_open_yes">Yes</string>
+    <string name="during_travel_facility_open_no">No</string>
+    <string name="during_travel_no_website">No website available</string>
+    <string name="during_travel_btn_get_directions">Get Directions</string>
+    <string name="during_travel_btn_call_facility">Call Facility</string>
+    <string name="cd_show_more_facilities">Show more facilities</string>
+
+    <!-- ===== PRE-TRAVEL SCREEN ===== -->
+    <string name="pre_travel_title">Get Prepared</string>
+    <string name="pre_travel_subtitle">Prevention is better than cure</string>
+    <string name="pre_travel_tool_health_risk">Health Risk\nAssessment</string>
+    <string name="pre_travel_tool_vaccine_record">Vaccine\nRecord</string>
+    <string name="pre_travel_no_advice">There\'s no advice for now.</string>
+    <string name="pre_travel_enter_trip_date">Enter Your Trip Date</string>
+    <string name="cd_set_schedule">Set Schedule</string>
+
+    <!-- ===== POST-TRAVEL SCREEN ===== -->
+    <string name="post_travel_title">Recovery &amp; Health</string>
+    <string name="post_travel_subtitle">Track your health after the journey</string>
+    <string name="post_travel_tool_health_screening">Health \nScreening</string>
+    <string name="post_travel_card_question">How was your health after Bali?</string>
+
+    <!-- ===== HEALTHCARE SCREEN ===== -->
+    <string name="healthcare_title">Healthcare Facilities</string>
+    <string name="healthcare_search_hint">Search by name, specialty, or area…</string>
+    <string name="healthcare_filter_all">All</string>
+    <string name="healthcare_no_facilities">No facilities found</string>
+    <string name="healthcare_btn_call">Call</string>
+    <string name="healthcare_btn_map">Map</string>
+    <string name="healthcare_distance_format">%.1f km away</string>
+    <string name="cd_list_view">List View</string>
+    <string name="cd_map_view">Map View</string>
+    <string name="cd_clear_search">Clear</string>
+
+    <!-- ===== NURSING CARE SCREEN ===== -->
+    <string name="nursing_care_title">Nursing Care Service</string>
+    <string name="nursing_care_your_appointment">Your Appointment</string>
+    <string name="nursing_care_years_experience">%d years experience</string>
+    <string name="nursing_care_rate_from">from %s</string>
+    <string name="nursing_care_meeting_point">Meeting Point</string>
+    <string name="nursing_care_contact_nurse">Contact Nurse</string>
+    <string name="cd_whatsapp">WhatsApp</string>
+
+    <!-- ===== NURSE DETAIL SCREEN ===== -->
+    <string name="nurse_detail_btn_book">Book</string>
+    <string name="nurse_detail_where_to_meet">Where to meet?</string>
+    <string name="nurse_detail_placeholder_address">Address</string>
+    <string name="nurse_detail_placeholder_date">DD/MM/YYYY Time</string>
+    <string name="nurse_detail_hint_description">Describe your condition…</string>
+    <string name="nurse_detail_char_count">%d/255</string>
+    <string name="nurse_detail_booking_confirmed">Appointment\nConfirmed</string>
+    <string name="nurse_detail_booking_failed_title">Appointment Failed</string>
+    <string name="nurse_detail_btn_try_again">Try again</string>
+    <string name="nurse_detail_map_enter_address">Enter Detailed Address</string>
+    <string name="nurse_detail_map_address_hint">e.g. Hotel name, room number…</string>
+    <string name="nurse_detail_btn_confirm_location">Confirm Location</string>
+
+    <!-- ===== PROFILE SCREEN ===== -->
+    <string name="profile_update_picture_title">Update Profile Picture</string>
+    <string name="profile_update_picture_body">Select a source</string>
+    <string name="profile_btn_gallery">Gallery</string>
+    <string name="profile_language_selector">🇬🇧 EN</string>
+    <string name="profile_field_name">Name</string>
+    <string name="profile_field_dob">Date of Birth</string>
+    <string name="profile_field_nationality">Nationality</string>
+    <string name="profile_field_gender">Gender</string>
+    <string name="profile_btn_edit">Edit Profile</string>
+    <string name="profile_unspecified" translatable="false">{unspecified}</string>
+    <string name="cd_profile_picture">Profile Picture</string>
+
+    <!-- ===== GUIDE SCREEN ===== -->
+    <string name="guide_header_title">Emergency guide</string>
+    <string name="guide_placeholder_title">{guide_title}</string>
+    <string name="guide_placeholder_description">{guide_description}</string>
+
 </resources>

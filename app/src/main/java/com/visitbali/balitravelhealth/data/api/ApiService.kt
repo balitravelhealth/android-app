@@ -5,12 +5,14 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Query
 
 data class UserResponse(
     val success: Boolean,
     val data: UserProfile?,
-    val message: String?
+    val message: String?,
+    val session_token: String?
 )
 
 data class SaveProfileRequest(
@@ -21,6 +23,12 @@ data class SaveProfileRequest(
     val dob: String,
     val gender: String
 )
+
+data class TravelDatesRequest(
+    val arrival_date: String,
+    val departure_date: String
+)
+
 interface ApiService {
     @GET("credentials.php")
     suspend fun getUserProfile(
@@ -30,13 +38,12 @@ interface ApiService {
 
     @POST("credentials.php")
     suspend fun saveUserProfile(
-        @Header("Authorization") authorization: String,
         @Body request: SaveProfileRequest
     ): UserResponse
 
-    @POST("credentials.php")
+    @PUT("credentials.php")
     suspend fun updateTravelDates(
-        @Query("arrival") arrival: String,
-        @Query("departure") departure: String
+        @Header("Authorization") authorization: String,
+        @Body dates: TravelDatesRequest
     ): UserResponse
 }

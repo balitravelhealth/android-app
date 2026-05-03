@@ -27,6 +27,45 @@ class TravelViewModel(application: Application) : AndroidViewModel(application) 
     private val _uiState = MutableStateFlow(TravelUiState())
     val uiState: StateFlow<TravelUiState> = _uiState.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            repository.fetchDatesFromServer()
+        }
+        viewModelScope.launch {
+            repository.arrivalDate.collect { arrival ->
+                arrival?.let { dateStr ->
+                    try {
+                        val date = LocalDate.parse(dateStr)
+                        _uiState.update { it.copy(arrivalDate = date) }
+                        checkForecastIfNeeded()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
+        viewModelScope.launch {
+            repository.departureDate.collect { departure ->
+                departure?.let { dateStr ->
+                    try {
+                        val date = LocalDate.parse(dateStr)
+                        _uiState.update { it.copy(departureDate = date) }
+                        checkForecastIfNeeded()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun checkForecastIfNeeded() {
+        val state = _uiState.value
+        if (state.arrivalDate != null && state.departureDate != null && state.seasonalForecast == null) {
+            fetchSeasonalForecast(state.arrivalDate, state.departureDate)
+        }
+    }
+
     fun updateArrival(date: LocalDate) {
         val currentState = _uiState.value
         // If current departure is before the new arrival, clear it
@@ -63,7 +102,7 @@ class TravelViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    private fun fetchSeasonalForecast(arrival: LocalDate, departure: LocalDate) {
+    fun fetchSeasonalForecast(arrival: LocalDate, departure: LocalDate) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             repository.getSeasonalForecast(arrival, departure)
@@ -76,7 +115,7 @@ class TravelViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    private fun saveAndSyncDates(arrival: LocalDate, departure: LocalDate) {
+    fun saveAndSyncDates(arrival: LocalDate, departure: LocalDate) {
         val formatter = DateTimeFormatter.ISO_LOCAL_DATE
         viewModelScope.launch {
             repository.saveTravelDates(arrival.format(formatter), departure.format(formatter))

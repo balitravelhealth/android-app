@@ -14,6 +14,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.visitbali.balitravelhealth.data.api.RetrofitClient
 import com.visitbali.balitravelhealth.data.pref.UserPreferences
 import com.visitbali.balitravelhealth.data.pref.UserProfile
+import com.visitbali.balitravelhealth.data.api.SaveProfileRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -74,66 +75,65 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 var userEmail = ""
                 var displayName = "User"
                 var idToken = ""
+                var photoUrl: String? = null
 
                 if (credential is GoogleIdTokenCredential) {
-                    userEmail = credential.id // id is usually the email in GoogleIdTokenCredential
+                    userEmail = credential.id
                     displayName = credential.displayName ?: "User"
                     idToken = credential.idToken
+                    photoUrl = credential.profilePictureUri?.toString()
                 } else if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                     val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                     userEmail = googleIdTokenCredential.id
                     displayName = googleIdTokenCredential.displayName ?: "User"
                     idToken = googleIdTokenCredential.idToken
+                    photoUrl = googleIdTokenCredential.profilePictureUri?.toString()
                 }
 
                 if (userEmail.isNotEmpty()) {
                     userPreferences.saveEmail(userEmail)
                     userPreferences.saveIdToken(idToken)
                     userPreferences.saveLoginStatus(true)
+                    photoUrl?.let { userPreferences.saveUserProfile(UserProfile(email = userEmail, name = displayName, country = "", dob = "", gender = "", photoUrl = it, isLoggedIn = true, isRegistered = false)) }
 
-                    // Check with server if user exists
                     try {
-                        val response = apiService.getUserProfile(
-                            authorization = "Bearer $idToken",
-                            email = userEmail)
-                        if (response.success && response.data != null) {
-                            // User exists on server, sync to local
-                            userPreferences.saveUserProfile(response.data.copy(isLoggedIn = true, isRegistered = true))
+                        // ← POST langsung, bukan GET
+                        // POST sudah handle user baru dan lama sekaligus
+                        val response = apiService.saveUserProfile(
+                            request = SaveProfileRequest(
+                                idToken  = idToken,
+                                email    = userEmail,
+                                name     = displayName,
+                                country  = "",
+                                dob      = "",
+                                gender   = ""
+                            )
+                        )
+
+                        if (response.success && response.session_token != null) {
+                            // Simpan session token
+                            userPreferences.saveSessionToken(response.session_token)
+                        }
+
+                        if (response.success && response.data != null &&
+                            response.data.country.isNotEmpty() &&
+                            response.data.gender.isNotEmpty()) {
+                            // User sudah pernah setup — langsung home
+                            userPreferences.saveUserProfile(
+                                response.data.copy(isLoggedIn = true, isRegistered = true)
+                            )
                             _uiState.value = LoginUiState.Success(displayName, isNewUser = false)
                         } else {
-                            // User doesn't exist on server, ensure local state matches
+                            // User baru atau belum setup
                             userPreferences.saveUserProfile(UserProfile(
-                                email = userEmail,
-                                name = "",
-                                country = "",
-                                dob = "",
-                                gender = "",
-                                isLoggedIn = true,
-                                isRegistered = false
+                                email = userEmail, name = displayName,
+                                country = "", dob = "", gender = "",
+                                isLoggedIn = true, isRegistered = false
                             ))
                             _uiState.value = LoginUiState.Success(displayName, isNewUser = true)
-                        }
-                    } catch (e: retrofit2.HttpException) {
-                        if (e.code() == 401) {
-                            Log.d("LoginViewModel", "Server returned 401: User not found or unauthorized. Treating as new user.")
-                            userPreferences.saveUserProfile(UserProfile(
-                                email = userEmail,
-                                name = "",
-                                country = "",
-                                dob = "",
-                                gender = "",
-                                isLoggedIn = true,
-                                isRegistered = false
-                            ))
-                            _uiState.value = LoginUiState.Success(displayName, isNewUser = true)
-                        } else {
-                            Log.e("LoginViewModel", "HTTP Error ${e.code()}", e)
-                            val currentUser = userPreferences.userProfile.first()
-                            _uiState.value = LoginUiState.Success(displayName, isNewUser = !currentUser.isRegistered)
                         }
                     } catch (e: Exception) {
                         Log.e("LoginViewModel", "Server sync error", e)
-                        // Fallback to local check if server is down
                         val currentUser = userPreferences.userProfile.first()
                         _uiState.value = LoginUiState.Success(displayName, isNewUser = !currentUser.isRegistered)
                     }

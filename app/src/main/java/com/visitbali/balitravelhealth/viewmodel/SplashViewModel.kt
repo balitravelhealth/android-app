@@ -24,53 +24,82 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
     init {
         viewModelScope.launch {
             val user = userPreferences.userProfile.first()
-            val idToken = userPreferences.idToken.first()
-            Log.d("SplashSync", "Local Email: ${user.email}, Local isRegistered: ${user.isRegistered}")
-            
-            if (user.email.isNotEmpty()) {
+            val sessionToken = userPreferences.sessionToken.first()  // pakai stored token langsung
+
+            if (user.email.isNotEmpty() && sessionToken.isNotEmpty()) {
                 try {
-                    Log.d("SplashSync", "Checking server for: ${user.email}")
                     val response = RetrofitClient.apiService.getUserProfile(
-                        authorization = "Bearer $idToken",
-                        email = user.email)
-                    Log.d("SplashSync", "Server Response: success=${response.success}, dataFound=${response.data != null}")
-                    
+                        authorization = "Bearer $sessionToken",
+                        email = user.email
+                    )
+
                     if (response.success && response.data != null) {
-                        Log.d("SplashSync", "User found on server. Syncing and going HOME.")
                         userPreferences.saveUserProfile(response.data.copy(isLoggedIn = true, isRegistered = true))
                         _startDestination.value = "home"
                     } else {
-                        Log.d("SplashSync", "User NOT found on server (success=false). Clearing local data.")
                         userPreferences.clear()
                         _startDestination.value = "login"
                     }
                 } catch (e: retrofit2.HttpException) {
                     if (e.code() == 401) {
-                        Log.w("SplashSync", "Server returned 401 Unauthorized. User not in DB. Clearing data.")
-                        userPreferences.clear()
-                        _startDestination.value = "login"
+                        // Token expired → minta login ulang, tapi jangan hapus data lokal
+                        Log.w("SplashSync", "Token expired. Need re-login.")
+                        _startDestination.value = if (user.isLoggedIn && user.isRegistered) "home" else "login"
                     } else {
-                        Log.e("SplashSync", "HTTP Error ${e.code()}. Redirecting to login.")
-                        _startDestination.value = "login"
+                        // Error teknis → fallback local
+                        _startDestination.value = if (user.isLoggedIn && user.isRegistered) "home" else "login"
                     }
                 } catch (e: Exception) {
-                    Log.e("SplashSync", "Server check failed: ${e.message}")
-                    // Fallback to local state ONLY if user was previously fully registered
-                    if (user.isLoggedIn && user.isRegistered) {
-                        Log.d("SplashSync", "Network error. Falling back to local HOME state.")
-                        _startDestination.value = "home"
-                    } else {
-                        Log.d("SplashSync", "Network error/Unregistered. Going LOGIN.")
-                        _startDestination.value = "login"
-                    }
+                    // Network error → fallback local
+                    Log.e("SplashSync", "Network error: ${e.message}")
+                    _startDestination.value = if (user.isLoggedIn && user.isRegistered) "home" else "login"
                 }
             } else {
-                Log.d("SplashSync", "No local email found. Going LOGIN.")
                 _startDestination.value = "login"
             }
-            
+
             delay(1500)
             _isLoading.value = false
+        }
+    }
+    private suspend fun refreshIdToken(): String {
+        return try {
+            val credentialManager = androidx.credentials.CredentialManager.create(getApplication())
+            val webClientId = "779721266536-an0g84psqn5b7fc8name2qbgajtpgih3.apps.googleusercontent.com"
+
+            val googleIdOption = com.google.android.libraries.identity.googleid.GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(true)
+                .setServerClientId(webClientId)
+                .setAutoSelectEnabled(true)
+                .build()
+
+            val request = androidx.credentials.GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
+
+            val result = credentialManager.getCredential(
+                context = getApplication(),
+                request = request
+            )
+            val credential = result.credential
+
+            val newToken = when {
+                credential is com.google.android.libraries.identity.googleid.GoogleIdTokenCredential ->
+                    credential.idToken
+                credential.type == com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL ->
+                    com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+                        .createFrom(credential.data).idToken
+                else -> ""
+            }
+
+            if (newToken.isNotEmpty()) {
+                userPreferences.saveIdToken(newToken)
+                Log.d("SplashSync", "Token refreshed successfully")
+            }
+            newToken
+        } catch (e: Exception) {
+            Log.e("SplashSync", "Silent token refresh failed: ${e.message}")
+            ""
         }
     }
 }

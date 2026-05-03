@@ -18,36 +18,39 @@ class SetupViewModel(application: Application) : AndroidViewModel(application) {
     fun saveUserProfile(name: String, country: String, dob: String, gender: String, onComplete: () -> Unit) {
         viewModelScope.launch {
             val currentEmail = userPreferences.userProfile.first().email
-            val idToken = userPreferences.idToken.first()
-            Log.d("SetupViewModel", "idToken length: ${idToken.length}")
+            val idToken      = userPreferences.idToken.first()
+
+            val dobForServer = try {
+                val input  = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+                val output = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                output.format(input.parse(dob)!!)
+            } catch (e: Exception) { dob }
+
             val profile = UserProfile(
-                email = currentEmail,
-                name = name,
-                country = country,
-                dob = dob,
-                gender = gender,
-                isLoggedIn = true,
-                isRegistered = true
+                email = currentEmail, name = name,
+                country = country, dob = dob,
+                gender = gender, isLoggedIn = true, isRegistered = true
             )
-            
-            // Save locally
             userPreferences.saveUserProfile(profile)
-            
-            // Sync to server
+
             try {
-                apiService.saveUserProfile(
-                    authorization = "Bearer $idToken",
+                val response = apiService.saveUserProfile(
                     request = SaveProfileRequest(
-                    idToken = idToken,
-                    email = currentEmail,
-                    name = name,
-                    country = country,
-                    dob = dob,
-                    gender = gender
+                        idToken  = idToken,
+                        email    = currentEmail,
+                        name     = name,
+                        country  = country,
+                        dob      = dobForServer,
+                        gender   = gender
                     )
                 )
+                // Simpan session token dari response
+                if (response.success && response.session_token != null) {
+                    userPreferences.saveSessionToken(response.session_token)
+                    Log.d("SetupViewModel", "Session token saved")
+                }
             } catch (e: Exception) {
-                Log.e("SetupViewModel", "Failed to sync profile to server: ${e.message}")
+                Log.e("SetupViewModel", "Failed to sync: ${e.message}")
             }
 
             onComplete()

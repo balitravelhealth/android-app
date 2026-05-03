@@ -1,7 +1,6 @@
 package com.visitbali.balitravelhealth.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -17,19 +16,18 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
-import com.visitbali.balitravelhealth.ui.theme.BaliTravelHealthTheme
 import com.visitbali.balitravelhealth.viewmodel.TravelUiState
 import com.visitbali.balitravelhealth.viewmodel.TravelViewModel
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,8 +45,7 @@ fun SetupTravelScreen(
         onBack = onBack,
         onNext = onNext,
         onSkip = onSkip,
-        onArrivalSelected = { viewModel.updateArrival(it) },
-        onDepartureSelected = { viewModel.updateDeparture(it) }
+        onRangeSelected = { start, end -> viewModel.saveAndSyncDates(start, end) }
     )
 }
 
@@ -59,11 +56,9 @@ fun SetupTravelScreenContent(
     onBack: () -> Unit,
     onNext: () -> Unit,
     onSkip: () -> Unit,
-    onArrivalSelected: (LocalDate) -> Unit,
-    onDepartureSelected: (LocalDate) -> Unit
+    onRangeSelected: (LocalDate, LocalDate) -> Unit
 ) {
-    var showArrivalPicker by remember { mutableStateOf(false) }
-    var showDeparturePicker by remember { mutableStateOf(false) }
+    var showRangePicker by remember { mutableStateOf(false) }
     val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
     
     val isDatesFilled = uiState.arrivalDate != null && uiState.departureDate != null
@@ -107,7 +102,7 @@ fun SetupTravelScreenContent(
             DateInput(
                 label = uiState.arrivalDate?.format(dateFormatter) ?: "Arrival Date",
                 modifier = Modifier.weight(1f),
-                onClick = { showArrivalPicker = true }
+                onClick = { showRangePicker = true }
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -117,7 +112,7 @@ fun SetupTravelScreenContent(
             DateInput(
                 label = uiState.departureDate?.format(dateFormatter) ?: "Departure Date",
                 modifier = Modifier.weight(1f),
-                onClick = { showDeparturePicker = true }
+                onClick = { showRangePicker = true }
             )
         }
 
@@ -205,25 +200,13 @@ fun SetupTravelScreenContent(
         Spacer(modifier = Modifier.height(24.dp))
     }
 
-    if (showArrivalPicker) {
-        DatePickerModal(
-            onDismiss = { showArrivalPicker = false },
-            onDateSelected = { 
-                onArrivalSelected(it)
-                showArrivalPicker = false 
-            }
-        )
-    }
-
-    if (showDeparturePicker) {
-        DatePickerModal(
-            onDismiss = { showDeparturePicker = false },
-            onDateSelected = { 
-                onDepartureSelected(it)
-                showDeparturePicker = false 
-            },
-            minDate = uiState.arrivalDate // Ensure departure cannot be before arrival
-        )
+    if (showRangePicker) {
+        DateRangePickerModal(
+            onDismiss = { showRangePicker = false }
+        ) { start, end ->
+            onRangeSelected(start, end)
+            showRangePicker = false 
+        }
     }
 }
 
@@ -233,11 +216,7 @@ fun GifImage(resId: Int, modifier: Modifier = Modifier) {
     val imageLoader = remember {
         ImageLoader.Builder(context)
             .components {
-                if (android.os.Build.VERSION.SDK_INT >= 28) {
-                    add(ImageDecoderDecoder.Factory())
-                } else {
-                    add(GifDecoder.Factory())
-                }
+                add(ImageDecoderDecoder.Factory())
             }
             .build()
     }
@@ -268,39 +247,41 @@ fun DateInput(label: String, modifier: Modifier = Modifier, onClick: () -> Unit)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerModal(
-    onDismiss: () -> Unit, 
-    onDateSelected: (LocalDate) -> Unit,
-    minDate: LocalDate? = null
+private fun DateRangePickerModal(
+    onDismiss: () -> Unit,
+    onDateRangeSelected: (LocalDate, LocalDate) -> Unit
 ) {
-    val datePickerState = rememberDatePickerState(
-        selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                if (minDate == null) return true
-                // Convert LocalDate to UTC millis for comparison
-                val minMillis = minDate.atStartOfDay(java.time.ZoneId.of("UTC")).toInstant().toEpochMilli()
-                return utcTimeMillis >= minMillis
-            }
-        }
-    )
+    val state = rememberDateRangePickerState()
+
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = {
-                datePickerState.selectedDateMillis?.let {
-                    // Convert UTC millis back to LocalDate
-                    val date = java.time.Instant.ofEpochMilli(it)
-                        .atZone(java.time.ZoneId.of("UTC"))
-                        .toLocalDate()
-                    onDateSelected(date)
-                }
-            }) { Text("OK") }
+            TextButton(
+                onClick = {
+                    val startMillis = state.selectedStartDateMillis
+                    val endMillis = state.selectedEndDateMillis
+                    if (startMillis != null && endMillis != null) {
+                        val start = Instant.ofEpochMilli(startMillis).atZone(ZoneId.of("UTC")).toLocalDate()
+                        val end = Instant.ofEpochMilli(endMillis).atZone(ZoneId.of("UTC")).toLocalDate()
+                        onDateRangeSelected(start, end)
+                    }
+                },
+                enabled = state.selectedStartDateMillis != null && state.selectedEndDateMillis != null
+            ) {
+                Text("OK")
+            }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
         }
     ) {
-        DatePicker(state = datePickerState)
+        DateRangePicker(
+            state = state,
+            title = { Text("Select Travel Dates", modifier = Modifier.padding(16.dp)) },
+            showModeToggle = false,
+            modifier = Modifier.weight(1f)
+        )
     }
 }
-

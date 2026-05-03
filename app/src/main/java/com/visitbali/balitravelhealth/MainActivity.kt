@@ -17,8 +17,26 @@ import com.visitbali.balitravelhealth.ui.screens.LoginScreen
 import com.visitbali.balitravelhealth.ui.screens.SetupScreen
 import com.visitbali.balitravelhealth.ui.screens.SetupTravelScreen
 import com.visitbali.balitravelhealth.ui.screens.HomeScreen
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.visitbali.balitravelhealth.ui.screens.PreTravelScreen
+import com.visitbali.balitravelhealth.ui.screens.PostTravelScreen
+import com.visitbali.balitravelhealth.ui.screens.DuringTravelScreen
+import com.visitbali.balitravelhealth.ui.screens.NursingCareScreen
+import com.visitbali.balitravelhealth.ui.screens.GuideScreen
+import com.visitbali.balitravelhealth.ui.screens.ProfileScreen
+import com.visitbali.balitravelhealth.viewmodel.ProfileViewModel
+import com.visitbali.balitravelhealth.data.repository.NurseRepository
+import com.visitbali.balitravelhealth.viewmodel.NursingCareViewModel
+import com.visitbali.balitravelhealth.data.api.RetrofitClient
+import com.visitbali.balitravelhealth.ui.screens.NurseDetailScreen
+import com.visitbali.balitravelhealth.viewmodel.TravelViewModel
 import com.visitbali.balitravelhealth.viewmodel.SetupViewModel
+import com.visitbali.balitravelhealth.data.model.Nurse
+import com.google.gson.Gson
+import com.visitbali.balitravelhealth.ui.screens.HealthcareScreen
+import com.visitbali.balitravelhealth.data.repository.HealthcareFacilityRepository
+import com.visitbali.balitravelhealth.viewmodel.HealthcareFacilityViewModel
+import com.visitbali.balitravelhealth.data.database.AppDatabase
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 class MainActivity : AppCompatActivity() {
@@ -93,7 +111,130 @@ class MainActivity : AppCompatActivity() {
                             )
                         }
                         composable("home") {
-                            HomeScreen()
+                            HomeScreen(
+                                onNavigateToPreTravel = {
+                                    navController.navigate("pre_travel")
+                                },
+                                onNavigateToDuringTravel = {
+                                    navController.navigate("during_travel")
+                                },
+                                onNavigateToPostTravel = {
+                                    navController.navigate("post_travel")
+                                },
+                                onNavigateToNursingCare = {
+                                    navController.navigate("nursing_care")
+                                },
+                                onNavigateToGuide = {
+                                    navController.navigate("guide")
+                                },
+                                onNavigateToProfile = {
+                                    navController.navigate("profile")
+                                }
+                            )
+                        }
+                        composable("profile") {
+                            ProfileScreen(
+                                onNavigateToHome = {
+                                    navController.navigate("home") {
+                                        popUpTo("home") { inclusive = true }
+                                    }
+                                },
+                                onNavigateToGuide = {
+                                    navController.navigate("guide") {
+                                        popUpTo("home") { inclusive = false }
+                                    }
+                                },
+                                onLoggedOut = {
+                                    navController.navigate("login") {
+                                        popUpTo(0) { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
+                        composable("guide") {
+                            GuideScreen(
+                                onNavigateToHome = {
+                                    navController.navigate("home") {
+                                        popUpTo("home") { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
+                        composable("pre_travel") {
+                            PreTravelScreen(
+                                onBack = { navController.popBackStack() },
+                                onNavigateToHealthcare = {
+                                    navController.navigate("healthcare")
+                                }
+                            )
+                        }
+                        composable("post_travel") {
+                            PostTravelScreen(
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                        composable("nursing_care") {
+                            val repository = NurseRepository(RetrofitClient.nurseApiService)
+                            val nursingViewModel: NursingCareViewModel = viewModel(
+                                factory = NursingCareViewModel.Factory(repository)
+                            )
+                            NursingCareScreen(
+                                viewModel = nursingViewModel,
+                                onBack = { navController.popBackStack() },
+                                onNurseClick = { nurse ->
+                                    val nurseJson = java.net.URLEncoder.encode(Gson().toJson(nurse), "UTF-8")
+                                    navController.navigate("nurse_detail/$nurseJson")
+                                }
+                            )
+                        }
+                        composable("nurse_detail/{nurseJson}") { backStackEntry ->
+                            val nurseJson = backStackEntry.arguments?.getString("nurseJson")
+                            val nurse = Gson().fromJson(nurseJson, Nurse::class.java)
+                            val travelViewModel: TravelViewModel = viewModel()
+                            val travelUiState by travelViewModel.uiState.collectAsState()
+                            
+                            val nurseRepository = NurseRepository(RetrofitClient.nurseApiService)
+                            val nursingViewModel: NursingCareViewModel = viewModel(
+                                factory = NursingCareViewModel.Factory(nurseRepository)
+                            )
+
+                            NurseDetailScreen(
+                                nurse = nurse,
+                                arrivalDate = travelUiState.arrivalDate,
+                                departureDate = travelUiState.departureDate,
+                                onBack = { navController.popBackStack() },
+                                onBookingComplete = {
+                                    navController.popBackStack("nursing_care", inclusive = false)
+                                },
+                                viewModel = nursingViewModel
+                            )
+                        }
+                        composable("during_travel") {
+                            val context = androidx.compose.ui.platform.LocalContext.current
+                            val db = AppDatabase.getDatabase(context)
+                            val repository = HealthcareFacilityRepository(db.healthcareFacilityDao())
+                            val healthcareViewModel: HealthcareFacilityViewModel = viewModel(
+                                factory = HealthcareFacilityViewModel.Factory(repository)
+                            )
+                            DuringTravelScreen(
+                                onBack = { navController.popBackStack() },
+                                onSeeMoreFacilities = {
+                                    navController.navigate("healthcare")
+                                },
+                                viewModel = healthcareViewModel
+                            )
+                        }
+                        composable("healthcare") {
+                            val context = androidx.compose.ui.platform.LocalContext.current
+                            val db = AppDatabase.getDatabase(context)
+                            val repository = HealthcareFacilityRepository(db.healthcareFacilityDao())
+                            val healthcareViewModel: HealthcareFacilityViewModel = viewModel(
+                                factory = HealthcareFacilityViewModel.Factory(repository)
+                            )
+                            HealthcareScreen(
+                                viewModel = healthcareViewModel,
+                                onBack = { navController.popBackStack() }
+                            )
                         }
                     }
                 }
