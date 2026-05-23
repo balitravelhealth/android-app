@@ -1,5 +1,6 @@
 package com.visitbali.balitravelhealth.data.repository
 
+import com.visitbali.balitravelhealth.data.dao.NurseDao
 import com.visitbali.balitravelhealth.data.dto.Appointment
 import com.visitbali.balitravelhealth.data.dto.BookAppointmentRequest
 import com.visitbali.balitravelhealth.data.dto.CreateNurseRequest
@@ -8,30 +9,44 @@ import com.visitbali.balitravelhealth.data.dto.NurseSingleResponse
 import com.visitbali.balitravelhealth.data.dto.UpdateNurseRequest
 import com.visitbali.balitravelhealth.data.model.Nurse
 import com.visitbali.balitravelhealth.data.remote.NurseApiService
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 class NurseRepository(
     private val api: NurseApiService,
+    private val nurseDao: NurseDao? = null
 ) {
+    val cachedNurses: Flow<List<Nurse>> = nurseDao?.getActiveNurses() ?: flowOf(emptyList())
 
     suspend fun getNurses(
         limit: Int = 20,
         offset: Int = 0,
         isActive: Boolean? = true,
     ): Result<List<Nurse>> = runCatching {
-        val response = api.listNurses(
-            limit = limit,
-            offset = offset,
-            isActive = isActive,
-        )
-        if (!response.success) {
-            error(response.message ?: "Gagal memuat daftar perawat")
+        try {
+            val response = api.listNurses(
+                limit = limit,
+                offset = offset,
+                isActive = isActive,
+            )
+            if (!response.success) {
+                error(response.message ?: "Gagal memuat daftar perawat")
+            }
+            nurseDao?.replaceAll(response.data)
+            response.data
+        } catch (e: Exception) {
+            val cached = nurseDao?.getActiveNursesSnapshot().orEmpty()
+            if (cached.isNotEmpty()) cached else throw e
         }
-        response.data
     }
 
     suspend fun getNurseById(id: String): Result<Nurse> = runCatching {
-        val response = api.getNurse(id)
-        response.data ?: error(response.message ?: "Perawat tidak ditemukan")
+        try {
+            val response = api.getNurse(id)
+            response.data ?: error(response.message ?: "Perawat tidak ditemukan")
+        } catch (e: Exception) {
+            nurseDao?.getById(id) ?: throw e
+        }
     }
 
     suspend fun createNurse(request: CreateNurseRequest): Result<Nurse> = runCatching {

@@ -1,6 +1,7 @@
 package com.visitbali.balitravelhealth.data.api
 
 import com.visitbali.balitravelhealth.data.pref.UserProfile
+import com.google.gson.JsonObject
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -29,6 +30,12 @@ data class TravelDatesRequest(
     val departure_date: String
 )
 
+
+data class BasicApiResponse(
+    val success: Boolean,
+    val message: String?
+)
+
 interface ApiService {
     @GET("credentials.php")
     suspend fun getUserProfile(
@@ -46,4 +53,5 @@ interface ApiService {
         @Header("Authorization") authorization: String,
         @Body dates: TravelDatesRequest
     ): UserResponse
+
 }

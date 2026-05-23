@@ -3,6 +3,7 @@ package com.visitbali.balitravelhealth.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import com.visitbali.balitravelhealth.BuildConfig
 import androidx.lifecycle.viewModelScope
 import com.visitbali.balitravelhealth.data.api.RetrofitClient
 import com.visitbali.balitravelhealth.data.api.SaveProfileRequest
@@ -47,10 +48,9 @@ class SetupViewModel(application: Application) : AndroidViewModel(application) {
                 // Simpan session token dari response
                 if (response.success && response.session_token != null) {
                     userPreferences.saveSessionToken(response.session_token)
-                    Log.d("SetupViewModel", "Session token saved")
                 }
             } catch (e: Exception) {
-                Log.e("SetupViewModel", "Failed to sync: ${e.message}")
+                if (BuildConfig.DEBUG) Log.e("SetupViewModel", "Failed to sync: ${e.message}")
             }
 
             onComplete()

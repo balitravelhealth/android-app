@@ -75,6 +75,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     fun updateCountry(country: String) { _uiState.update { it.copy(country = country) } }
     fun updateGender(gender: String) { _uiState.update { it.copy(gender = gender) } }
     fun updateProfilePicture(uri: Uri?) { _uiState.update { it.copy(profilePictureUri = uri) } }
+    fun clearMessages() { _uiState.update { it.copy(error = null) } }
 
     fun logout(onLoggedOut: () -> Unit) {
         viewModelScope.launch {

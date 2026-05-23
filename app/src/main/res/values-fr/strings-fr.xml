@@ -1,0 +1,151 @@
+﻿<resources>
+    <string name="app_name">Bali Travel Health</string>
+
+    <!-- ===== COMMON / SHARED ===== -->
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Annuler</string>
+    <string name="btn_next">Suivant</string>
+    <string name="btn_back">Retour</string>
+    <string name="btn_save">Enregistrer</string>
+    <string name="label_advice">Conseils</string>
+    <string name="label_tools">Outils</string>
+    <string name="label_schedule">Calendrier</string>
+    <string name="label_description">Description</string>
+    <string name="cd_back">Retour</string>
+    <string name="cd_close">Fermer</string>
+    <string name="picker_title_select_travel_dates">Choisir les dates de voyage</string>
+
+    <!-- ===== LOGIN SCREEN ===== -->
+    <string name="cd_jalak_bali">Jalak Bali</string>
+    <string name="cd_logo">Logo</string>
+    <string name="cd_google_icon">IcÃ´ne Google</string>
+    <string name="btn_continue_with_google">Continuer avec Google</string>
+
+
+    <!-- ===== SETUP SCREEN ===== -->
+    <string name="setup_title">C\'est parti !</string>
+    <string name="setup_subtitle">Avant tout, nous avons besoin de quelques infos.\nElles serviront Ã  personnaliser ton expÃ©rience.</string>
+    <string name="setup_hint_name">Entre ton prÃ©nom</string>
+    <string name="setup_placeholder_country">Pays de rÃ©sidence</string>
+    <string name="setup_placeholder_dob">Date de naissance</string>
+    <string name="setup_placeholder_gender">Genre</string>
+    <string name="setup_dialog_select_gender">Choisis ton genre</string>
+    <string name="setup_gender_male">Homme</string>
+    <string name="setup_gender_female">Femme</string>
+
+    <!-- ===== SETUP TRAVEL SCREEN ===== -->
+    <string name="setup_travel_title">PrÃªt Ã  voyager ?</string>
+    <string name="setup_travel_subtitle">Les prÃ©visions saisonniÃ¨res t\'aident Ã  planifier tes activitÃ©s selon le climat tropical de Bali.</string>
+    <string name="setup_travel_placeholder_arrival">Date d\'arrivÃ©e</string>
+    <string name="setup_travel_placeholder_departure">Date de dÃ©part</string>
+    <string name="setup_travel_hint_select_dates">SÃ©lectionne des dates pour voir les prÃ©visions saisonniÃ¨res</string>
+    <string name="setup_travel_season_headline">Super !\nCe sera %s pendant ces jours !</string>
+    <string name="setup_travel_btn_skip">Passer pour l\'instant</string>
+
+    <!-- ===== HOME SCREEN ===== -->
+    <string name="home_welcome_back">Content de te revoir,</string>
+    <string name="home_headline_in_bali">Bienvenue Ã  Bali !\nPrends soin de ta santÃ©</string>
+    <string name="home_headline_not_in_bali">Reste en bonne santÃ©\ndurant ton sÃ©jour Ã  Bali</string>
+    <string name="home_subtext_enjoy">Profite bien de ton sÃ©jour Ã  Bali !</string>
+    <string name="home_subtext_leaving">Tu quitteras Bali\ndans %s</string>
+    <string name="home_subtext_going">Tu pars Ã  Bali\ndans %s</string>
+    <string name="home_card_pre_travel_title">Avant le voyage</string>
+    <string name="home_card_pre_travel_desc">PrÃ©pare ta santÃ©\navant de partir</string>
+    <string name="home_card_during_travel_title">Pendant le voyage</string>
+    <string name="home_card_during_travel_desc">Surveille ta santÃ©\ndurant le voyage</string>
+    <string name="home_card_post_travel_title">AprÃ¨s le voyage</string>
+    <string name="home_card_post_travel_desc">Bilan de santÃ©\naprÃ¨s le voyage</string>
+    <string name="home_card_nursing_care_title">Soins infirmiers</string>
+    <string name="home_card_nursing_care_desc">BÃ©nÃ©ficie de soins infirmiers\npendant ton voyage</string>
+    <string name="cd_avatar">Avatar</string>
+
+    <!-- ===== BOTTOM NAVIGATION ===== -->
+    <string name="nav_home">Accueil</string>
+    <string name="nav_guide">Guide</string>
+    <string name="nav_profile">Profil</string>
+    <string name="cd_profile">Profil</string>
+
+    <!-- ===== DURING TRAVEL SCREEN ===== -->
+    <string name="during_travel_title">En voyage</string>
+    <string name="during_travel_subtitle">Tout peut arriver. Ne t\'inquiÃ¨te pas</string>
+    <string name="during_travel_section_health_facility">Ã‰tablissements de santÃ©</string>
+    <string name="during_travel_section_life_support">Premiers secours</string>
+    <string name="during_travel_facility_specialty">SpÃ©cialitÃ© : %s</string>
+    <string name="during_travel_facility_open_24h">Ouvert 24h/24 : %s</string>
+    <string name="during_travel_facility_open_yes">Oui</string>
+    <string name="during_travel_facility_open_no">Non</string>
+    <string name="during_travel_no_website">Pas de site web disponible</string>
+    <string name="during_travel_btn_get_directions">Obtenir l\'itinÃ©raire</string>
+    <string name="during_travel_btn_call_facility">Appeler l\'Ã©tablissement</string>
+    <string name="cd_show_more_facilities">Voir plus d\'Ã©tablissements</string>
+
+    <!-- ===== PRE-TRAVEL SCREEN ===== -->
+    <string name="pre_travel_title">Bien se prÃ©parer</string>
+    <string name="pre_travel_subtitle">Mieux vaut prÃ©venir que guÃ©rir</string>
+    <string name="pre_travel_tool_health_risk">Ã‰valuation des\nrisques sanitaires</string>
+    <string name="pre_travel_tool_vaccine_record">Carnet\nde vaccination</string>
+    <string name="pre_travel_no_advice">Pas de conseil pour l\'instant.</string>
+    <string name="pre_travel_enter_trip_date">Indique ta date de voyage</string>
+    <string name="cd_set_schedule">DÃ©finir le calendrier</string>
+
+    <!-- ===== POST-TRAVEL SCREEN ===== -->
+    <string name="post_travel_title">RÃ©tablissement &amp; SantÃ©</string>
+    <string name="post_travel_subtitle">Surveille ta santÃ© aprÃ¨s le voyage</string>
+    <string name="post_travel_tool_health_screening">Bilan\nde santÃ©</string>
+    <string name="post_travel_card_question">Comment Ã©tait ta santÃ© aprÃ¨s Bali ?</string>
+
+    <!-- ===== HEALTHCARE SCREEN ===== -->
+    <string name="healthcare_title">Ã‰tablissements de santÃ©</string>
+    <string name="healthcare_search_hint">Rechercher par nom, spÃ©cialitÃ© ou zoneâ€¦</string>
+    <string name="healthcare_filter_all">Tous</string>
+    <string name="healthcare_no_facilities">Aucun Ã©tablissement trouvÃ©</string>
+    <string name="healthcare_btn_call">Appeler</string>
+    <string name="healthcare_btn_map">Carte</string>
+    <string name="healthcare_distance_format">Ã  %.1f km</string>
+    <string name="cd_list_view">Vue liste</string>
+    <string name="cd_map_view">Vue carte</string>
+    <string name="cd_clear_search">Effacer</string>
+
+    <!-- ===== NURSING CARE SCREEN ===== -->
+    <string name="nursing_care_title">Service de soins infirmiers</string>
+    <string name="nursing_care_your_appointment">Ton rendez-vous</string>
+    <string name="nursing_care_years_experience">%d ans d\'expÃ©rience</string>
+    <string name="nursing_care_rate_from">Ã  partir de %s</string>
+    <string name="nursing_care_meeting_point">Point de rendez-vous</string>
+    <string name="nursing_care_contact_nurse">Contacter l\'infirmier(e)</string>
+    <string name="cd_whatsapp">WhatsApp</string>
+
+    <!-- ===== NURSE DETAIL SCREEN ===== -->
+    <string name="nurse_detail_btn_book">RÃ©server</string>
+    <string name="nurse_detail_where_to_meet">OÃ¹ veux-tu qu\'on se retrouve ?</string>
+    <string name="nurse_detail_placeholder_address">Adresse</string>
+    <string name="nurse_detail_placeholder_date">JJ/MM/AAAA Heure</string>
+    <string name="nurse_detail_hint_description">DÃ©cris ton Ã©tatâ€¦</string>
+    <string name="nurse_detail_char_count">%d/255</string>
+    <string name="nurse_detail_booking_confirmed">Rendez-vous\nConfirmÃ©</string>
+    <string name="nurse_detail_booking_failed_title">RÃ©servation Ã©chouÃ©e</string>
+    <string name="nurse_detail_btn_try_again">RÃ©essayer</string>
+    <string name="nurse_detail_map_enter_address">Entre l\'adresse prÃ©cise</string>
+    <string name="nurse_detail_map_address_hint">ex. Nom de l\'hÃ´tel, numÃ©ro de chambreâ€¦</string>
+    <string name="nurse_detail_btn_confirm_location">Confirmer l\'emplacement</string>
+
+    <!-- ===== PROFILE SCREEN ===== -->
+    <string name="profile_update_picture_title">Modifier la photo de profil</string>
+    <string name="profile_update_picture_body">Choisis une source</string>
+    <string name="profile_btn_gallery">Galerie</string>
+    <string name="profile_language_selector">ðŸ‡«ðŸ‡· FR</string>
+    <string name="profile_field_name">PrÃ©nom</string>
+    <string name="profile_field_dob">Date de naissance</string>
+    <string name="profile_field_nationality">NationalitÃ©</string>
+    <string name="profile_field_gender">Genre</string>
+    <string name="profile_btn_edit">Modifier le profil</string>
+    <string name="profile_unspecified">{non renseignÃ©}</string>
+    <string name="cd_profile_picture">Photo de profil</string>
+
+    <!-- ===== GUIDE SCREEN ===== -->
+    <string name="guide_header_title">Guide d\'urgence</string>
+    <string name="guide_placeholder_title">{titre_guide}</string>
+    <string name="guide_placeholder_description">{description_guide}</string>
+
+</resources>
+

@@ -34,7 +34,11 @@ import com.visitbali.balitravelhealth.data.model.Nurse
 import com.google.gson.Gson
 import com.visitbali.balitravelhealth.ui.screens.HealthcareScreen
 import com.visitbali.balitravelhealth.data.repository.HealthcareFacilityRepository
+import com.visitbali.balitravelhealth.data.repository.GuideRepository
+import com.visitbali.balitravelhealth.data.repository.LifeSupportRepository
 import com.visitbali.balitravelhealth.viewmodel.HealthcareFacilityViewModel
+import com.visitbali.balitravelhealth.viewmodel.GuideViewModel
+import com.visitbali.balitravelhealth.viewmodel.LifeSupportViewModel
 import com.visitbali.balitravelhealth.data.database.AppDatabase
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -152,12 +156,18 @@ class MainActivity : AppCompatActivity() {
                             )
                         }
                         composable("guide") {
+                            val context = androidx.compose.ui.platform.LocalContext.current
+                            val db = AppDatabase.getDatabase(context)
+                            val guideViewModel: GuideViewModel = viewModel(
+                                factory = GuideViewModel.Factory(GuideRepository(db.guideItemDao()))
+                            )
                             GuideScreen(
                                 onNavigateToHome = {
                                     navController.navigate("home") {
                                         popUpTo("home") { inclusive = true }
                                     }
-                                }
+                                },
+                                viewModel = guideViewModel
                             )
                         }
                         composable("pre_travel") {
@@ -174,7 +184,12 @@ class MainActivity : AppCompatActivity() {
                             )
                         }
                         composable("nursing_care") {
-                            val repository = NurseRepository(RetrofitClient.nurseApiService)
+                            val context = androidx.compose.ui.platform.LocalContext.current
+                            val db = AppDatabase.getDatabase(context)
+                            val repository = NurseRepository(
+                                api = RetrofitClient.nurseApiService,
+                                nurseDao = db.nurseDao()
+                            )
                             val nursingViewModel: NursingCareViewModel = viewModel(
                                 factory = NursingCareViewModel.Factory(repository)
                             )
@@ -193,7 +208,12 @@ class MainActivity : AppCompatActivity() {
                             val travelViewModel: TravelViewModel = viewModel()
                             val travelUiState by travelViewModel.uiState.collectAsState()
                             
-                            val nurseRepository = NurseRepository(RetrofitClient.nurseApiService)
+                            val context = androidx.compose.ui.platform.LocalContext.current
+                            val db = AppDatabase.getDatabase(context)
+                            val nurseRepository = NurseRepository(
+                                api = RetrofitClient.nurseApiService,
+                                nurseDao = db.nurseDao()
+                            )
                             val nursingViewModel: NursingCareViewModel = viewModel(
                                 factory = NursingCareViewModel.Factory(nurseRepository)
                             )
@@ -216,12 +236,18 @@ class MainActivity : AppCompatActivity() {
                             val healthcareViewModel: HealthcareFacilityViewModel = viewModel(
                                 factory = HealthcareFacilityViewModel.Factory(repository)
                             )
+                            val lifeSupportViewModel: LifeSupportViewModel = viewModel(
+                                factory = LifeSupportViewModel.Factory(
+                                    LifeSupportRepository(db.lifeSupportItemDao())
+                                )
+                            )
                             DuringTravelScreen(
                                 onBack = { navController.popBackStack() },
                                 onSeeMoreFacilities = {
                                     navController.navigate("healthcare")
                                 },
-                                viewModel = healthcareViewModel
+                                viewModel = healthcareViewModel,
+                                lifeSupportViewModel = lifeSupportViewModel
                             )
                         }
                         composable("healthcare") {

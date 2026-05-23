@@ -5,19 +5,20 @@ package com.visitbali.balitravelhealth.data.api
 
 
 import com.visitbali.balitravelhealth.BuildConfig
+import com.visitbali.balitravelhealth.data.remote.ContentApiService
 import com.visitbali.balitravelhealth.data.remote.NurseApiService
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    // 10.0.2.2 is the special IP that refers to your computer's localhost from the Emulator
-    private const val BASE_URL = "https://balihealth.me/"
+    private const val AUTH_BASE_URL = "https://auth.balihealth.me/"
 
     private val logging = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+        level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
     }
 
     private val appAuthInterceptor = Interceptor { chain ->
@@ -32,21 +33,40 @@ object RetrofitClient {
     private val client = OkHttpClient.Builder()
         .addInterceptor(appAuthInterceptor)
         .addInterceptor(logging)
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
+        .writeTimeout(15, TimeUnit.SECONDS)
         .build()
 
-    private val retrofit: Retrofit by lazy {
+    private fun normalizedBaseUrl(url: String): String {
+        return if (url.endsWith("/")) url else "$url/"
+    }
+
+    private val authRetrofit: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(AUTH_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+    }
+
+    private val otherRetrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(normalizedBaseUrl(BuildConfig.OTHER_API_BASE_URL))
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
     }
 
     val apiService: ApiService by lazy {
-        retrofit.create(ApiService::class.java)
+        authRetrofit.create(ApiService::class.java)
     }
 
     val nurseApiService: NurseApiService by lazy {
-        retrofit.create(NurseApiService::class.java)
+        otherRetrofit.create(NurseApiService::class.java)
+    }
+
+    val contentApiService: ContentApiService by lazy {
+        otherRetrofit.create(ContentApiService::class.java)
     }
 }

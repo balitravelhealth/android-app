@@ -1,9 +1,13 @@
 package com.visitbali.balitravelhealth.data.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import java.math.BigDecimal
 
+@Entity(tableName = "nurses")
 data class Nurse(
+    @PrimaryKey
     @SerializedName("id")
     val id: String,
 

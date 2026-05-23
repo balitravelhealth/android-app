@@ -1,0 +1,151 @@
+﻿<resources>
+    <string name="app_name">Bali Travel Health</string>
+
+    <!-- ===== COMMON / SHARED ===== -->
+    <string name="btn_ok">í™•ì¸</string>
+    <string name="btn_cancel">ì·¨ì†Œ</string>
+    <string name="btn_next">ë‹¤ìŒ</string>
+    <string name="btn_back">ë’¤ë¡œ</string>
+    <string name="btn_save">ì €ìž¥</string>
+    <string name="label_advice">ì¡°ì–¸</string>
+    <string name="label_tools">ë„êµ¬</string>
+    <string name="label_schedule">ì¼ì •</string>
+    <string name="label_description">ì„¤ëª…</string>
+    <string name="cd_back">ë’¤ë¡œ</string>
+    <string name="cd_close">ë‹«ê¸°</string>
+    <string name="picker_title_select_travel_dates">ì—¬í–‰ ë‚ ì§œ ì„ íƒ</string>
+
+    <!-- ===== LOGIN SCREEN ===== -->
+    <string name="cd_jalak_bali">ìž˜ë½ ë°œë¦¬</string>
+    <string name="cd_logo">ë¡œê³ </string>
+    <string name="cd_google_icon">êµ¬ê¸€ ì•„ì´ì½˜</string>
+    <string name="btn_continue_with_google">Googleë¡œ ê³„ì†í•˜ê¸°</string>
+
+
+    <!-- ===== SETUP SCREEN ===== -->
+    <string name="setup_title">ì‹œìž‘í•´ë³¼ê¹Œìš”!</string>
+    <string name="setup_subtitle">ë¨¼ì € ëª‡ ê°€ì§€ ì •ë³´ê°€ í•„ìš”í•´ìš”.\nì´ ì •ë³´ëŠ” ë§žì¶¤ ê²½í—˜ì„ ì œê³µí•˜ëŠ” ë° ì‚¬ìš©ë©ë‹ˆë‹¤.</string>
+    <string name="setup_hint_name">ì´ë¦„ì„ ìž…ë ¥í•˜ì„¸ìš”</string>
+    <string name="setup_placeholder_country">ê±°ì£¼ êµ­ê°€</string>
+    <string name="setup_placeholder_dob">ìƒë…„ì›”ì¼</string>
+    <string name="setup_placeholder_gender">ì„±ë³„</string>
+    <string name="setup_dialog_select_gender">ì„±ë³„ ì„ íƒ</string>
+    <string name="setup_gender_male">ë‚¨ì„±</string>
+    <string name="setup_gender_female">ì—¬ì„±</string>
+
+    <!-- ===== SETUP TRAVEL SCREEN ===== -->
+    <string name="setup_travel_title">ì—¬í–‰ ì¤€ë¹„ëë‚˜ìš”?</string>
+    <string name="setup_travel_subtitle">ê³„ì ˆ ì˜ˆë³´ë¥¼ í†µí•´ ë°œë¦¬ì˜ ì—´ëŒ€ ê¸°í›„ì— ë§žëŠ” í™œë™ì„ ê³„íší•´ë³´ì„¸ìš”.</string>
+    <string name="setup_travel_placeholder_arrival">ë„ì°©ì¼</string>
+    <string name="setup_travel_placeholder_departure">ì¶œë°œì¼</string>
+    <string name="setup_travel_hint_select_dates">ë‚ ì§œë¥¼ ì„ íƒí•˜ë©´ ê³„ì ˆ ì •ë³´ë¥¼ ë³¼ ìˆ˜ ìžˆì–´ìš”</string>
+    <string name="setup_travel_season_headline">ì¢‹ì•„ìš”!\nê·¸ ê¸°ê°„ì—ëŠ” %sì˜ˆìš”!</string>
+    <string name="setup_travel_btn_skip">ë‚˜ì¤‘ì— í• ê²Œìš”</string>
+
+    <!-- ===== HOME SCREEN ===== -->
+    <string name="home_welcome_back">ë‹¤ì‹œ ì˜¤ì…¨êµ°ìš”,</string>
+    <string name="home_headline_in_bali">ë°œë¦¬ì— ì˜¤ì‹  ê²ƒì„ í™˜ì˜í•´ìš”!\nê±´ê°•í•˜ê²Œ ì§€ë‚´ì„¸ìš”</string>
+    <string name="home_headline_not_in_bali">ë°œë¦¬ ì—¬í–‰ ì¤‘ì—ë„\nê±´ê°•í•˜ê²Œ ì§€ë‚´ì„¸ìš”</string>
+    <string name="home_subtext_enjoy">ë°œë¦¬ ì—¬í–‰ì„ ì¦ê²¨ë³´ì„¸ìš”!</string>
+    <string name="home_subtext_leaving">%s í›„ì—\në°œë¦¬ë¥¼ ë– ë‚©ë‹ˆë‹¤</string>
+    <string name="home_subtext_going">%s í›„ì—\në°œë¦¬ë¡œ ë– ë‚©ë‹ˆë‹¤</string>
+    <string name="home_card_pre_travel_title">ì—¬í–‰ ì „</string>
+    <string name="home_card_pre_travel_desc">ì—¬í–‰ ì „\nê±´ê°•ì„ ì¤€ë¹„í•˜ì„¸ìš”</string>
+    <string name="home_card_during_travel_title">ì—¬í–‰ ì¤‘</string>
+    <string name="home_card_during_travel_desc">ì—¬í–‰ ì¤‘\nê±´ê°• ìƒíƒœë¥¼ í™•ì¸í•˜ì„¸ìš”</string>
+    <string name="home_card_post_travel_title">ì—¬í–‰ í›„</string>
+    <string name="home_card_post_travel_desc">ì—¬í–‰ í›„\nê±´ê°• ê²€ì§„ì„ ë°›ìœ¼ì„¸ìš”</string>
+    <string name="home_card_nursing_care_title">ê°„í˜¸ ì„œë¹„ìŠ¤</string>
+    <string name="home_card_nursing_care_desc">ì—¬í–‰ ì¤‘\nê°„í˜¸ ì„œë¹„ìŠ¤ë¥¼ ë°›ìœ¼ì„¸ìš”</string>
+    <string name="cd_avatar">ì•„ë°”íƒ€</string>
+
+    <!-- ===== BOTTOM NAVIGATION ===== -->
+    <string name="nav_home">í™ˆ</string>
+    <string name="nav_guide">ê°€ì´ë“œ</string>
+    <string name="nav_profile">í”„ë¡œí•„</string>
+    <string name="cd_profile">í”„ë¡œí•„</string>
+
+    <!-- ===== DURING TRAVEL SCREEN ===== -->
+    <string name="during_travel_title">ì—¬í–‰ ì¤‘</string>
+    <string name="during_travel_subtitle">ë¬´ìŠ¨ ì¼ì´ ìƒê²¨ë„ ê±±ì • ë§ˆì„¸ìš”</string>
+    <string name="during_travel_section_health_facility">ì˜ë£Œ ì‹œì„¤</string>
+    <string name="during_travel_section_life_support">ì‘ê¸‰ ì²˜ì¹˜</string>
+    <string name="during_travel_facility_specialty">ì „ë¬¸ ë¶„ì•¼ : %s</string>
+    <string name="during_travel_facility_open_24h">24ì‹œê°„ ìš´ì˜ : %s</string>
+    <string name="during_travel_facility_open_yes">ì˜ˆ</string>
+    <string name="during_travel_facility_open_no">ì•„ë‹ˆìš”</string>
+    <string name="during_travel_no_website">ì›¹ì‚¬ì´íŠ¸ ì—†ìŒ</string>
+    <string name="during_travel_btn_get_directions">ê¸¸ ì°¾ê¸°</string>
+    <string name="during_travel_btn_call_facility">ì‹œì„¤ì— ì „í™”í•˜ê¸°</string>
+    <string name="cd_show_more_facilities">ì‹œì„¤ ë” ë³´ê¸°</string>
+
+    <!-- ===== PRE-TRAVEL SCREEN ===== -->
+    <string name="pre_travel_title">ë¯¸ë¦¬ ì¤€ë¹„í•´ìš”</string>
+    <string name="pre_travel_subtitle">ì˜ˆë°©ì´ ì¹˜ë£Œë³´ë‹¤ ë‚«ìŠµë‹ˆë‹¤</string>
+    <string name="pre_travel_tool_health_risk">ê±´ê°• ìœ„í—˜\ní‰ê°€</string>
+    <string name="pre_travel_tool_vaccine_record">ë°±ì‹ \nì ‘ì¢… ê¸°ë¡</string>
+    <string name="pre_travel_no_advice">í˜„ìž¬ ì¡°ì–¸ì´ ì—†ìŠµë‹ˆë‹¤.</string>
+    <string name="pre_travel_enter_trip_date">ì—¬í–‰ ë‚ ì§œë¥¼ ìž…ë ¥í•˜ì„¸ìš”</string>
+    <string name="cd_set_schedule">ì¼ì • ì„¤ì •</string>
+
+    <!-- ===== POST-TRAVEL SCREEN ===== -->
+    <string name="post_travel_title">íšŒë³µ &amp; ê±´ê°•</string>
+    <string name="post_travel_subtitle">ì—¬í–‰ í›„ ê±´ê°• ìƒíƒœë¥¼ í™•ì¸í•˜ì„¸ìš”</string>
+    <string name="post_travel_tool_health_screening">ê±´ê°•\nê²€ì§„</string>
+    <string name="post_travel_card_question">ë°œë¦¬ ì—¬í–‰ í›„ ê±´ê°•ì€ ì–´ë– ì…¨ë‚˜ìš”?</string>
+
+    <!-- ===== HEALTHCARE SCREEN ===== -->
+    <string name="healthcare_title">ì˜ë£Œ ì‹œì„¤</string>
+    <string name="healthcare_search_hint">ì´ë¦„, ì „ë¬¸ ë¶„ì•¼, ì§€ì—­ìœ¼ë¡œ ê²€ìƒ‰â€¦</string>
+    <string name="healthcare_filter_all">ì „ì²´</string>
+    <string name="healthcare_no_facilities">ì‹œì„¤ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤</string>
+    <string name="healthcare_btn_call">ì „í™”</string>
+    <string name="healthcare_btn_map">ì§€ë„</string>
+    <string name="healthcare_distance_format">%.1f km ê±°ë¦¬</string>
+    <string name="cd_list_view">ëª©ë¡ ë³´ê¸°</string>
+    <string name="cd_map_view">ì§€ë„ ë³´ê¸°</string>
+    <string name="cd_clear_search">ì§€ìš°ê¸°</string>
+
+    <!-- ===== NURSING CARE SCREEN ===== -->
+    <string name="nursing_care_title">ê°„í˜¸ ì„œë¹„ìŠ¤</string>
+    <string name="nursing_care_your_appointment">ë‚´ ì˜ˆì•½</string>
+    <string name="nursing_care_years_experience">%dë…„ ê²½ë ¥</string>
+    <string name="nursing_care_rate_from">%së¶€í„°</string>
+    <string name="nursing_care_meeting_point">ë§Œë‚¨ ìž¥ì†Œ</string>
+    <string name="nursing_care_contact_nurse">ê°„í˜¸ì‚¬ì—ê²Œ ì—°ë½</string>
+    <string name="cd_whatsapp">WhatsApp</string>
+
+    <!-- ===== NURSE DETAIL SCREEN ===== -->
+    <string name="nurse_detail_btn_book">ì˜ˆì•½í•˜ê¸°</string>
+    <string name="nurse_detail_where_to_meet">ì–´ë””ì„œ ë§Œë‚ ê¹Œìš”?</string>
+    <string name="nurse_detail_placeholder_address">ì£¼ì†Œ</string>
+    <string name="nurse_detail_placeholder_date">ì¼/ì›”/ë…„ ì‹œê°„</string>
+    <string name="nurse_detail_hint_description">í˜„ìž¬ ìƒíƒœë¥¼ ì„¤ëª…í•´ì£¼ì„¸ìš”â€¦</string>
+    <string name="nurse_detail_char_count">%d/255</string>
+    <string name="nurse_detail_booking_confirmed">ì˜ˆì•½ì´\ní™•ì •ë˜ì—ˆìŠµë‹ˆë‹¤</string>
+    <string name="nurse_detail_booking_failed_title">ì˜ˆì•½ ì‹¤íŒ¨</string>
+    <string name="nurse_detail_btn_try_again">ë‹¤ì‹œ ì‹œë„</string>
+    <string name="nurse_detail_map_enter_address">ìƒì„¸ ì£¼ì†Œ ìž…ë ¥</string>
+    <string name="nurse_detail_map_address_hint">ì˜ˆ: í˜¸í…” ì´ë¦„, ê°ì‹¤ ë²ˆí˜¸â€¦</string>
+    <string name="nurse_detail_btn_confirm_location">ìœ„ì¹˜ í™•ì¸</string>
+
+    <!-- ===== PROFILE SCREEN ===== -->
+    <string name="profile_update_picture_title">í”„ë¡œí•„ ì‚¬ì§„ ë³€ê²½</string>
+    <string name="profile_update_picture_body">ì†ŒìŠ¤ ì„ íƒ</string>
+    <string name="profile_btn_gallery">ê°¤ëŸ¬ë¦¬</string>
+    <string name="profile_language_selector">ðŸ‡°ðŸ‡· KO</string>
+    <string name="profile_field_name">ì´ë¦„</string>
+    <string name="profile_field_dob">ìƒë…„ì›”ì¼</string>
+    <string name="profile_field_nationality">êµ­ì </string>
+    <string name="profile_field_gender">ì„±ë³„</string>
+    <string name="profile_btn_edit">í”„ë¡œí•„ ìˆ˜ì •</string>
+    <string name="profile_unspecified">{ë¯¸ìž…ë ¥}</string>
+    <string name="cd_profile_picture">í”„ë¡œí•„ ì‚¬ì§„</string>
+
+    <!-- ===== GUIDE SCREEN ===== -->
+    <string name="guide_header_title">ê¸´ê¸‰ ê°€ì´ë“œ</string>
+    <string name="guide_placeholder_title">{ê°€ì´ë“œ_ì œëª©}</string>
+    <string name="guide_placeholder_description">{ê°€ì´ë“œ_ì„¤ëª…}</string>
+
+</resources>
+

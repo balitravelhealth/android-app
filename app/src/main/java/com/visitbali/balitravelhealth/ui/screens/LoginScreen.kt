@@ -122,37 +122,9 @@ fun LoginScreen(
                         )
                     }
                 }
-
-                // Apple Button
-                Button(
-                    onClick = { /* TODO */ },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE5E5E5)),
-                    shape = RoundedCornerShape(28.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.apple_icon),
-                            contentDescription = "Apple Icon",
-                            modifier = Modifier.size(30.dp)
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(
-                            text = "Continue With Apple",
-                            color = Color.Black,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium
-                    )
-                }
             }
         }
     }
-}
 }
 
 @Preview(showBackground = true)

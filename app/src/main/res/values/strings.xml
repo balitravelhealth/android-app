@@ -1,4 +1,4 @@
-<resources>
+﻿<resources>
     <string name="app_name" translatable="false">Bali Travel Health</string>
 
     <!-- ===== COMMON / SHARED ===== -->
@@ -20,8 +20,6 @@
     <string name="cd_logo">Logo</string>
     <string name="cd_google_icon">Google Icon</string>
     <string name="btn_continue_with_google">Continue With Google</string>
-    <string name="cd_apple_icon">Apple Icon</string>
-    <string name="btn_continue_with_apple">Continue With Apple</string>
 
     <!-- ===== SETUP SCREEN ===== -->
     <string name="setup_title">Let\'s get started!</string>
@@ -97,7 +95,7 @@
 
     <!-- ===== HEALTHCARE SCREEN ===== -->
     <string name="healthcare_title">Healthcare Facilities</string>
-    <string name="healthcare_search_hint">Search by name, specialty, or area…</string>
+    <string name="healthcare_search_hint">Search by name, specialty, or areaâ€¦</string>
     <string name="healthcare_filter_all">All</string>
     <string name="healthcare_no_facilities">No facilities found</string>
     <string name="healthcare_btn_call">Call</string>
@@ -121,20 +119,20 @@
     <string name="nurse_detail_where_to_meet">Where to meet?</string>
     <string name="nurse_detail_placeholder_address">Address</string>
     <string name="nurse_detail_placeholder_date">DD/MM/YYYY Time</string>
-    <string name="nurse_detail_hint_description">Describe your condition…</string>
+    <string name="nurse_detail_hint_description">Describe your conditionâ€¦</string>
     <string name="nurse_detail_char_count">%d/255</string>
     <string name="nurse_detail_booking_confirmed">Appointment\nConfirmed</string>
     <string name="nurse_detail_booking_failed_title">Appointment Failed</string>
     <string name="nurse_detail_btn_try_again">Try again</string>
     <string name="nurse_detail_map_enter_address">Enter Detailed Address</string>
-    <string name="nurse_detail_map_address_hint">e.g. Hotel name, room number…</string>
+    <string name="nurse_detail_map_address_hint">e.g. Hotel name, room numberâ€¦</string>
     <string name="nurse_detail_btn_confirm_location">Confirm Location</string>
 
     <!-- ===== PROFILE SCREEN ===== -->
     <string name="profile_update_picture_title">Update Profile Picture</string>
     <string name="profile_update_picture_body">Select a source</string>
     <string name="profile_btn_gallery">Gallery</string>
-    <string name="profile_language_selector">🇬🇧 EN</string>
+    <string name="profile_language_selector">ðŸ‡¬ðŸ‡§ EN</string>
     <string name="profile_field_name">Name</string>
     <string name="profile_field_dob">Date of Birth</string>
     <string name="profile_field_nationality">Nationality</string>

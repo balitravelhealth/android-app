@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -55,6 +56,7 @@ fun HomeScreen(
     HomeScreenContent(
         uiState = uiState,
         onRefresh = { viewModel.refreshData() },
+        onLocationPermissionGranted = { viewModel.refreshData(syncContent = false) },
         onNavigateToPreTravel = onNavigateToPreTravel,
         onNavigateToDuringTravel = onNavigateToDuringTravel,
         onNavigateToPostTravel = onNavigateToPostTravel,
@@ -69,6 +71,7 @@ fun HomeScreen(
 fun HomeScreenContent(
     uiState: HomeUiState,
     onRefresh: () -> Unit,
+    onLocationPermissionGranted: () -> Unit = {},
     onNavigateToPreTravel: () -> Unit = {},
     onNavigateToDuringTravel: () -> Unit = {},
     onNavigateToPostTravel: () -> Unit = {},
@@ -83,7 +86,7 @@ fun HomeScreenContent(
         androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions[android.Manifest.permission.ACCESS_FINE_LOCATION] == true) {
-            onRefresh()
+            onLocationPermissionGranted()
         }
     }
 
@@ -113,7 +116,6 @@ fun HomeScreenContent(
         }
         val blurRadius = (blurAlphaProgress * 15).dp
         val headerHeight = 351.dp
-        val imgAvatarPlaceholder = "https://www.figma.com/api/mcp/asset/f0d043ca-a4ad-43f1-86a0-a4a306a0a9d1"
 
         PullToRefreshBox(
             isRefreshing = uiState.isRefreshing,
@@ -143,7 +145,7 @@ fun HomeScreenContent(
                     // Header Overlay Text
                     HeaderContent(
                         uiState = uiState,
-                        avatarUrl = imgAvatarPlaceholder,
+                        avatarUrl = null,
                         modifier = Modifier.graphicsLayer {
                             alpha = 1f - blurAlphaProgress * 1.5f // Fade out faster
                         }
@@ -201,7 +203,7 @@ fun HomeScreenContent(
 @Composable
 fun HeaderContent(
     uiState: HomeUiState,
-    avatarUrl: String,
+    avatarUrl: String?,
     modifier: Modifier = Modifier
 ) {
     val userName = uiState.userName
@@ -402,12 +404,21 @@ fun HomeCard(data: HomeCardData, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun GenericAvatar(imageUrl: String, modifier: Modifier = Modifier) {
+fun GenericAvatar(imageUrl: String?, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.size(40.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center
     ) {
-        AsyncImage(model = imageUrl, contentDescription = "Avatar", modifier = Modifier.size(24.dp))
+        if (imageUrl != null) {
+            AsyncImage(model = imageUrl, contentDescription = "Avatar", modifier = Modifier.size(24.dp))
+        } else {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "Avatar",
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
     }
 }
 
@@ -418,7 +429,6 @@ fun BaliNavigationBar(
     onGuideClick: () -> Unit = {},
     onProfileClick: () -> Unit = {}
 ) {
-    val imgAvatarPlaceholder = "https://www.figma.com/api/mcp/asset/f0d043ca-a4ad-43f1-86a0-a4a306a0a9d1"
     var selectedItem by remember { mutableIntStateOf(initialSelectedItem) }
     
     NavigationBar(
@@ -462,16 +472,13 @@ fun BaliNavigationBar(
                 selectedItem = 2
                 onProfileClick()
             }, 
-            icon = { 
-                AsyncImage(
-                    model = imgAvatarPlaceholder, // Logic to be replaced with actual user profile picture
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Person,
                     contentDescription = "Profile",
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
+                    modifier = Modifier.size(24.dp)
                 )
-            }, 
+            },
             label = { Text("Profile", style = MaterialTheme.typography.labelMedium) }
         )
     }

@@ -11,6 +11,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.visitbali.balitravelhealth.BuildConfig
 import com.visitbali.balitravelhealth.data.api.RetrofitClient
 import com.visitbali.balitravelhealth.data.pref.UserPreferences
 import com.visitbali.balitravelhealth.data.pref.UserProfile
@@ -30,14 +31,11 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     fun onGoogleSignInClick(context: Context) {
         viewModelScope.launch {
-            Log.d("LoginViewModel", "Starting Google Sign-In process")
             _uiState.value = LoginUiState.Loading
-            
+
             val credentialManager = CredentialManager.create(context)
-            
-            // TODO: Replace with your actual Web Client ID from Google Cloud Console
-            val webClientId = "YOUR_GOOGLE_OAUTH_CLIENT_ID"
-            
+            val webClientId = BuildConfig.GOOGLE_WEB_CLIENT_ID
+
             val googleIdOption = GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(false)
                 .setServerClientId(webClientId)
@@ -49,18 +47,16 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 .build()
 
             try {
-                Log.d("LoginViewModel", "Requesting credentials...")
                 val result = credentialManager.getCredential(
                     context = context,
                     request = request
                 )
-                Log.d("LoginViewModel", "Credentials received successfully")
                 handleSignInResult(result)
             } catch (e: GetCredentialException) {
-                Log.e("LoginViewModel", "Credential Manager error: ${e.message}", e)
-                _uiState.value = LoginUiState.Error(e.message ?: "Sign-in failed")
+                if (BuildConfig.DEBUG) Log.e("LoginViewModel", "Credential Manager error: ${e.message}", e)
+                _uiState.value = LoginUiState.Error(formatGoogleSignInError(e))
             } catch (e: Exception) {
-                Log.e("LoginViewModel", "Unexpected error during sign-in", e)
+                if (BuildConfig.DEBUG) Log.e("LoginViewModel", "Unexpected error during sign-in", e)
                 _uiState.value = LoginUiState.Error("An unexpected error occurred")
             }
         }
@@ -68,8 +64,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun handleSignInResult(result: GetCredentialResponse) {
         val credential = result.credential
-        Log.d("LoginViewModel", "Received credential type: ${credential::class.java.name}")
-        
+
         viewModelScope.launch {
             try {
                 var userEmail = ""
@@ -94,11 +89,14 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                     userPreferences.saveEmail(userEmail)
                     userPreferences.saveIdToken(idToken)
                     userPreferences.saveLoginStatus(true)
-                    photoUrl?.let { userPreferences.saveUserProfile(UserProfile(email = userEmail, name = displayName, country = "", dob = "", gender = "", photoUrl = it, isLoggedIn = true, isRegistered = false)) }
+                    photoUrl?.let {
+                        userPreferences.saveUserProfile(UserProfile(
+                            email = userEmail, name = displayName, country = "", dob = "",
+                            gender = "", photoUrl = it, isLoggedIn = true, isRegistered = false
+                        ))
+                    }
 
                     try {
-                        // ← POST langsung, bukan GET
-                        // POST sudah handle user baru dan lama sekaligus
                         val response = apiService.saveUserProfile(
                             request = SaveProfileRequest(
                                 idToken  = idToken,
@@ -111,29 +109,26 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                         )
 
                         if (response.success && response.session_token != null) {
-                            // Simpan session token
                             userPreferences.saveSessionToken(response.session_token)
                         }
 
                         if (response.success && response.data != null &&
                             response.data.country.isNotEmpty() &&
                             response.data.gender.isNotEmpty()) {
-                            // User sudah pernah setup — langsung home
                             userPreferences.saveUserProfile(
-                                response.data.copy(isLoggedIn = true, isRegistered = true)
+                                response.data.copy(isLoggedIn = true, isRegistered = true, photoUrl = photoUrl)
                             )
                             _uiState.value = LoginUiState.Success(displayName, isNewUser = false)
                         } else {
-                            // User baru atau belum setup
                             userPreferences.saveUserProfile(UserProfile(
                                 email = userEmail, name = displayName,
-                                country = "", dob = "", gender = "",
+                                country = "", dob = "", gender = "", photoUrl = photoUrl,
                                 isLoggedIn = true, isRegistered = false
                             ))
                             _uiState.value = LoginUiState.Success(displayName, isNewUser = true)
                         }
                     } catch (e: Exception) {
-                        Log.e("LoginViewModel", "Server sync error", e)
+                        if (BuildConfig.DEBUG) Log.e("LoginViewModel", "Server sync error", e)
                         val currentUser = userPreferences.userProfile.first()
                         _uiState.value = LoginUiState.Success(displayName, isNewUser = !currentUser.isRegistered)
                     }
@@ -141,9 +136,16 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                     _uiState.value = LoginUiState.Error("Failed to get user information")
                 }
             } catch (e: Exception) {
-                Log.e("LoginViewModel", "Error parsing Google ID Token credential", e)
+                if (BuildConfig.DEBUG) Log.e("LoginViewModel", "Error parsing Google ID Token credential", e)
                 _uiState.value = LoginUiState.Error("Failed to parse login information")
             }
+        }
+    }
+
+    private fun formatGoogleSignInError(e: GetCredentialException): String {
+        return when (e.type) {
+            "androidx.credentials.TYPE_GET_CREDENTIAL_CANCELED_EXCEPTION" -> "Sign-in was cancelled"
+            else -> e.message ?: "Sign-in failed"
         }
     }
 }

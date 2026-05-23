@@ -32,8 +32,18 @@ class NursingCareViewModel(
     val uiState: StateFlow<NursingCareUiState> = _uiState.asStateFlow()
 
     init {
+        observeCachedNurses()
         checkUserAppointment()
-        loadNurses()
+    }
+
+    private fun observeCachedNurses() {
+        viewModelScope.launch {
+            repository.cachedNurses.collect { cached ->
+                if (cached.isNotEmpty()) {
+                    _uiState.update { it.copy(nurses = cached) }
+                }
+            }
+        }
     }
 
     fun checkUserAppointment() {
@@ -75,7 +85,12 @@ class NursingCareViewModel(
             result.onSuccess { list ->
                 _uiState.update { it.copy(nurses = list, isLoading = false) }
             }.onFailure { e ->
-                _uiState.update { it.copy(isLoading = false, error = e.message) }
+                _uiState.update { state ->
+                    state.copy(
+                        isLoading = false,
+                        error = if (state.nurses.isEmpty()) e.message else null
+                    )
+                }
             }
         }
     }

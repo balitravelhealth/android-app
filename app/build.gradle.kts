@@ -29,6 +29,18 @@ android {
             "\"${localProps.getProperty("API_SECRET_KEY", "")}\""
         )
 
+        buildConfigField(
+            "String",
+            "GOOGLE_WEB_CLIENT_ID",
+            "\"${localProps.getProperty("GOOGLE_WEBCLIENT", "")}\""
+        )
+
+        buildConfigField(
+            "String",
+            "OTHER_API_BASE_URL",
+            "\"${localProps.getProperty("OTHER_API_BASE_URL", "https://api-placeholder.balihealth.me/")}\""
+        )
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -37,11 +49,15 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            isMinifyEnabled = false
         }
     }
     compileOptions {

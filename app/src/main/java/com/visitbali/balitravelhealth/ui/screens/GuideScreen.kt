@@ -22,20 +22,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.visitbali.balitravelhealth.R
+import com.visitbali.balitravelhealth.data.model.GuideItem
 import com.visitbali.balitravelhealth.ui.theme.BaliTravelHealthTheme
+import com.visitbali.balitravelhealth.viewmodel.GuideViewModel
 import kotlin.math.min
 
 @Composable
 fun GuideScreen(
+    onNavigateToHome: () -> Unit = {},
+    viewModel: GuideViewModel
+) {
+    val guides by viewModel.guides.collectAsState()
+    GuideScreenContent(
+        guides = guides,
+        onNavigateToHome = onNavigateToHome
+    )
+}
+
+@Composable
+private fun GuideScreenContent(
+    guides: List<GuideItem>,
     onNavigateToHome: () -> Unit = {}
 ) {
-    val placeholderGuides = List(10) { 
-        GuideItemData(
-            title = "{guide_title}",
-            description = "{guide_description}"
-        )
-    }
-
     val lazyListState = rememberLazyListState()
     val headerHeight = 320.dp
     
@@ -81,7 +89,7 @@ fun GuideScreen(
                     Spacer(modifier = Modifier.height(headerHeight))
                 }
                 
-                items(placeholderGuides) { guide ->
+                items(guides) { guide ->
                     Surface(color = Color.White) {
                         Column {
                             GuideListItem(guide = guide)
@@ -141,7 +149,7 @@ private fun GuideHeader(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun GuideListItem(guide: GuideItemData) {
+private fun GuideListItem(guide: GuideItem) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -180,15 +188,19 @@ private fun GuideListItem(guide: GuideItemData) {
     }
 }
 
-private data class GuideItemData(
-    val title: String,
-    val description: String
-)
-
 @Preview(showBackground = true)
 @Composable
 private fun GuideScreenPreview() {
     BaliTravelHealthTheme {
-        GuideScreen()
+        GuideScreenContent(
+            guides = List(4) {
+                GuideItem(
+                    id = it.toString(),
+                    title = "Emergency guide",
+                    description = "What to do first in an urgent health situation.",
+                    sortOrder = it
+                )
+            }
+        )
     }
 }

@@ -7,8 +7,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.visitbali.balitravelhealth.data.api.RetrofitClient
+import com.visitbali.balitravelhealth.data.database.AppDatabase
 import com.visitbali.balitravelhealth.data.pref.UserPreferences
+import com.visitbali.balitravelhealth.data.repository.AppContentSyncRepository
 import com.visitbali.balitravelhealth.data.repository.TravelRepository
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -36,12 +40,23 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val userPreferences = UserPreferences(application)
     private val travelRepository = TravelRepository(application)
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
+    private val contentSyncRepository: AppContentSyncRepository
 
     private val _isInBali = MutableStateFlow(false)
 
     init {
+        val db = AppDatabase.getDatabase(application)
+        contentSyncRepository = AppContentSyncRepository(
+            context = application,
+            contentApi = RetrofitClient.contentApiService,
+            nurseApi = RetrofitClient.nurseApiService,
+            healthcareFacilityDao = db.healthcareFacilityDao(),
+            guideItemDao = db.guideItemDao(),
+            lifeSupportItemDao = db.lifeSupportItemDao(),
+            nurseDao = db.nurseDao()
+        )
         observeUserData()
-        refreshData()
+        refreshData(syncContent = false)
     }
 
     private fun observeUserData() {
@@ -85,10 +100,19 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun refreshData() {
+    fun refreshData(syncContent: Boolean = true) {
         viewModelScope.launch {
             _uiState.update { it.copy(isRefreshing = true) }
-            checkLocation()
+            val locationTask = async { checkLocation() }
+            val syncTask = async {
+                if (syncContent) {
+                    contentSyncRepository.refreshIfConnected()
+                } else {
+                    Result.success(Unit)
+                }
+            }
+            locationTask.await()
+            syncTask.await()
             _uiState.update { it.copy(isRefreshing = false, isLoading = false) }
         }
     }

@@ -4,8 +4,11 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.visitbali.balitravelhealth.BuildConfig
 import com.visitbali.balitravelhealth.data.api.RetrofitClient
+import com.visitbali.balitravelhealth.data.database.AppDatabase
 import com.visitbali.balitravelhealth.data.pref.UserPreferences
+import com.visitbali.balitravelhealth.data.repository.AppContentSyncRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,11 +23,25 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
     val startDestination = _startDestination.asStateFlow()
 
     private val userPreferences = UserPreferences(application)
+    private val contentSyncRepository: AppContentSyncRepository
 
     init {
+        val db = AppDatabase.getDatabase(application)
+        contentSyncRepository = AppContentSyncRepository(
+            context = application,
+            contentApi = RetrofitClient.contentApiService,
+            nurseApi = RetrofitClient.nurseApiService,
+            healthcareFacilityDao = db.healthcareFacilityDao(),
+            guideItemDao = db.guideItemDao(),
+            lifeSupportItemDao = db.lifeSupportItemDao(),
+            nurseDao = db.nurseDao()
+        )
+
         viewModelScope.launch {
+            contentSyncRepository.refreshIfConnected()
+
             val user = userPreferences.userProfile.first()
-            val sessionToken = userPreferences.sessionToken.first()  // pakai stored token langsung
+            val sessionToken = userPreferences.sessionToken.first()
 
             if (user.email.isNotEmpty() && sessionToken.isNotEmpty()) {
                 try {
@@ -41,17 +58,10 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
                         _startDestination.value = "login"
                     }
                 } catch (e: retrofit2.HttpException) {
-                    if (e.code() == 401) {
-                        // Token expired → minta login ulang, tapi jangan hapus data lokal
-                        Log.w("SplashSync", "Token expired. Need re-login.")
-                        _startDestination.value = if (user.isLoggedIn && user.isRegistered) "home" else "login"
-                    } else {
-                        // Error teknis → fallback local
-                        _startDestination.value = if (user.isLoggedIn && user.isRegistered) "home" else "login"
-                    }
+                    if (BuildConfig.DEBUG) Log.w("SplashSync", "Token expired (${e.code()}). Falling back to local state.")
+                    _startDestination.value = if (user.isLoggedIn && user.isRegistered) "home" else "login"
                 } catch (e: Exception) {
-                    // Network error → fallback local
-                    Log.e("SplashSync", "Network error: ${e.message}")
+                    if (BuildConfig.DEBUG) Log.e("SplashSync", "Network error: ${e.message}")
                     _startDestination.value = if (user.isLoggedIn && user.isRegistered) "home" else "login"
                 }
             } else {
@@ -62,10 +72,15 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
             _isLoading.value = false
         }
     }
+
     private suspend fun refreshIdToken(): String {
         return try {
             val credentialManager = androidx.credentials.CredentialManager.create(getApplication())
-            val webClientId = "779721266536-an0g84psqn5b7fc8name2qbgajtpgih3.apps.googleusercontent.com"
+            val webClientId = BuildConfig.GOOGLE_WEB_CLIENT_ID
+            if (webClientId.isBlank()) {
+                if (BuildConfig.DEBUG) Log.e("SplashSync", "GOOGLE_WEBCLIENT is missing from local.properties")
+                return ""
+            }
 
             val googleIdOption = com.google.android.libraries.identity.googleid.GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(true)
@@ -94,11 +109,11 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
 
             if (newToken.isNotEmpty()) {
                 userPreferences.saveIdToken(newToken)
-                Log.d("SplashSync", "Token refreshed successfully")
+                if (BuildConfig.DEBUG) Log.d("SplashSync", "Token refreshed successfully")
             }
             newToken
         } catch (e: Exception) {
-            Log.e("SplashSync", "Silent token refresh failed: ${e.message}")
+            if (BuildConfig.DEBUG) Log.e("SplashSync", "Silent token refresh failed: ${e.message}")
             ""
         }
     }

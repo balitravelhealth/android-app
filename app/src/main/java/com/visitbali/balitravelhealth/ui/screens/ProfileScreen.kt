@@ -8,10 +8,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
@@ -44,6 +46,7 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
     
     var showPhotoPickerOptions by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
@@ -54,43 +57,80 @@ fun ProfileScreen(
         uri?.let { viewModel.updateProfilePicture(it) }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        ProfileContent(
-            uiState = uiState,
-            onEditToggle = { viewModel.toggleEditMode() },
-            onCancel = { viewModel.cancelEdit() },
-            onSave = { viewModel.saveProfile() },
-            onUpdateName = { viewModel.updateName(it) },
-            onUpdateDob = { viewModel.updateDob(it) },
-            onUpdateCountry = { viewModel.updateCountry(it) },
-            onUpdateGender = { viewModel.updateGender(it) },
-            onPhotoClick = { if (uiState.isEditMode) showPhotoPickerOptions = true },
-            onLogoutClick = { showLogoutDialog = true }
-        )
-        
-        if (showPhotoPickerOptions) {
-            // ... (previous AlertDialog for photo picker)
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearMessages()
         }
+    }
 
-        if (showLogoutDialog) {
-            AlertDialog(
-                onDismissRequest = { showLogoutDialog = false },
-                title = { Text("Logout") },
-                text = { Text("Are you sure you want to log out?") },
-                confirmButton = {
-                    TextButton(onClick = { 
-                        showLogoutDialog = false 
-                        viewModel.logout(onLoggedOut)
-                    }) {
-                        Text("Logout", color = Color.Red)
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showLogoutDialog = false }) {
-                        Text("Cancel")
-                    }
-                }
+    Scaffold(
+        containerColor = Color.White,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        bottomBar = {
+            BaliNavigationBar(
+                initialSelectedItem = 2,
+                onHomeClick = onNavigateToHome,
+                onGuideClick = onNavigateToGuide,
+                onProfileClick = {}
             )
+        }
+    ) { padding ->
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            ProfileContent(
+                uiState = uiState,
+                onEditToggle = { viewModel.toggleEditMode() },
+                onCancel = { viewModel.cancelEdit() },
+                onSave = { viewModel.saveProfile() },
+                onUpdateName = { viewModel.updateName(it) },
+                onUpdateDob = { viewModel.updateDob(it) },
+                onUpdateCountry = { viewModel.updateCountry(it) },
+                onUpdateGender = { viewModel.updateGender(it) },
+                onPhotoClick = { if (uiState.isEditMode) showPhotoPickerOptions = true },
+                onLogoutClick = { showLogoutDialog = true }
+            )
+            
+            if (showPhotoPickerOptions) {
+                AlertDialog(
+                    onDismissRequest = { showPhotoPickerOptions = false },
+                    title = { Text("Update Profile Picture") },
+                    text = { Text("Select a source") },
+                    confirmButton = {
+                        TextButton(onClick = { 
+                            galleryLauncher.launch("image/*")
+                            showPhotoPickerOptions = false 
+                        }) {
+                            Text("Gallery")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showPhotoPickerOptions = false }) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
+
+            if (showLogoutDialog) {
+                AlertDialog(
+                    onDismissRequest = { showLogoutDialog = false },
+                    title = { Text("Logout") },
+                    text = { Text("Are you sure you want to log out?") },
+                    confirmButton = {
+                        TextButton(onClick = { 
+                            showLogoutDialog = false 
+                            viewModel.logout(onLoggedOut)
+                        }) {
+                            Text("Logout", color = Color.Red)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showLogoutDialog = false }) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
         }
     }
 }
@@ -142,18 +182,22 @@ fun ProfileContent(
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(
-                modifier = Modifier.padding(horizontal = 24.dp).padding(top = 64.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 64.dp, bottom = 24.dp)
             ) {
                 ProfileField(label = "Name", value = uiState.name, isEditable = uiState.isEditMode, onValueChange = onUpdateName)
                 ProfileField(label = "Date of Birth", value = uiState.dob, isEditable = uiState.isEditMode, onValueChange = onUpdateDob)
                 ProfileField(label = "Nationality", value = uiState.country, isEditable = uiState.isEditMode, onValueChange = onUpdateCountry)
                 ProfileField(label = "Gender", value = uiState.gender, isEditable = uiState.isEditMode, onValueChange = onUpdateGender)
 
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 if (uiState.isEditMode) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         OutlinedButton(
@@ -179,7 +223,7 @@ fun ProfileContent(
                 } else {
                     Button(
                         onClick = onEditToggle,
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp).height(56.dp),
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
                         shape = RoundedCornerShape(28.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                     ) {
