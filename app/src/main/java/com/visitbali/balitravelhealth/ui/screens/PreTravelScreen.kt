@@ -36,6 +36,10 @@ import java.time.format.DateTimeFormatter
 fun PreTravelScreen(
     onBack: () -> Unit,
     onNavigateToHealthcare: () -> Unit = {},
+    onNavigateToAssessment: () -> Unit = {},
+    onNavigateToVaccination: () -> Unit = {},
+    onNavigateToDestinations: () -> Unit = {},
+    onNavigateToServices: () -> Unit = {},
     viewModel: TravelViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -44,6 +48,10 @@ fun PreTravelScreen(
         uiState = uiState,
         onBack = onBack,
         onNavigateToHealthcare = onNavigateToHealthcare,
+        onNavigateToAssessment = onNavigateToAssessment,
+        onNavigateToVaccination = onNavigateToVaccination,
+        onNavigateToDestinations = onNavigateToDestinations,
+        onNavigateToServices = onNavigateToServices,
         onDatesSelected = { start, end ->
             viewModel.saveAndSyncDates(start, end)
         }
@@ -56,6 +64,10 @@ fun PreTravelContent(
     uiState: com.visitbali.balitravelhealth.viewmodel.TravelUiState,
     onBack: () -> Unit,
     onNavigateToHealthcare: () -> Unit = {},
+    onNavigateToAssessment: () -> Unit = {},
+    onNavigateToVaccination: () -> Unit = {},
+    onNavigateToDestinations: () -> Unit = {},
+    onNavigateToServices: () -> Unit = {},
     onDatesSelected: (LocalDate, LocalDate) -> Unit
 ) {
     var showRangePicker by remember { mutableStateOf(value = false) }
@@ -126,13 +138,13 @@ fun PreTravelContent(
                     title = "Health Risk\nAssessment",
                     color = Color(0xFF1565C0),
                     iconRes = R.drawable.ic_assessment,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).clickable { onNavigateToAssessment() }
                 )
                 ToolCard(
                     title = "Vaccine\nRecord",
                     color = Color(0xFFD49110),
                     iconRes = R.drawable.ic_vaccine,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).clickable { onNavigateToVaccination() }
                 )
             }
 
@@ -142,9 +154,18 @@ fun PreTravelContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Placeholder for future tool or center current tools
-                Box(modifier = Modifier.weight(1f))
-                Box(modifier = Modifier.weight(1f))
+                ToolCard(
+                    title = "Destination\nHealth Risks",
+                    color = Color(0xFF2E7D32),
+                    iconRes = R.drawable.ic_placepin,
+                    modifier = Modifier.weight(1f).clickable { onNavigateToDestinations() }
+                )
+                ToolCard(
+                    title = "Travel\nServices",
+                    color = MaterialTheme.colorScheme.primary,
+                    iconRes = R.drawable.ic_hospital,
+                    modifier = Modifier.weight(1f).clickable { onNavigateToServices() }
+                )
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -294,6 +315,10 @@ fun PreTravelScreenPreview() {
             ),
             onBack = {},
             onNavigateToHealthcare = {},
+            onNavigateToAssessment = {},
+            onNavigateToVaccination = {},
+            onNavigateToDestinations = {},
+            onNavigateToServices = {},
             onDatesSelected = { _, _ -> }
         )
     }

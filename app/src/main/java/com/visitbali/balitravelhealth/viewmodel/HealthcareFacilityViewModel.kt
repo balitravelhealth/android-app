@@ -38,8 +38,8 @@ class HealthcareFacilityViewModel(
 
     private val _searchQuery = MutableStateFlow("")
     private val _activeFilter = MutableStateFlow<FacilityType?>(null)
-    private val _userLocation = MutableStateFlow<UserLocation?>(null)
-    private val _sortByDistance = MutableStateFlow(false)
+    private val _userLocation = MutableStateFlow<UserLocation?>(UserLocation(-8.6705, 115.2126))
+    private val _sortByDistance = MutableStateFlow(true)
 
     val uiState: StateFlow<FacilityUiState> = combine(
         _searchQuery,

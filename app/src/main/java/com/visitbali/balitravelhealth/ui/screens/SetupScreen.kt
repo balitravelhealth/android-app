@@ -7,8 +7,9 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -62,7 +63,20 @@ fun SetupScreenContent(
     var showDatePicker by remember { mutableStateOf(false) }
     var showGenderDialog by remember { mutableStateOf(false) }
 
-    val datePickerState = rememberDatePickerState()
+    val todayMillis = remember { System.currentTimeMillis() }
+    val minDobMillis = remember {
+        java.time.LocalDate.now()
+            .minusYears(120)
+            .atStartOfDay(java.time.ZoneOffset.UTC)
+            .toInstant()
+            .toEpochMilli()
+    }
+    val datePickerState = rememberDatePickerState(
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+                utcTimeMillis in minDobMillis..todayMillis
+        }
+    )
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
@@ -86,13 +100,13 @@ fun SetupScreenContent(
         Spacer(modifier = Modifier.height(24.dp))
         
         IconButton(onClick = onBackClick) {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
+            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.Black)
         }
         
         Spacer(modifier = Modifier.height(24.dp))
         
         Text(
-            text = "Let's get started!",
+            text = "Let's Get Started",
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Serif,
@@ -102,7 +116,7 @@ fun SetupScreenContent(
         Spacer(modifier = Modifier.height(8.dp))
         
         Text(
-            text = "Before that, we need to know some of your information.\nThis information will used to maximize your personal experience.",
+            text = "Before that, we need to know some of your information. This information will be used to maximize your personal experience.",
             fontSize = 12.sp,
             color = Color.Gray,
             lineHeight = 20.sp
@@ -110,7 +124,7 @@ fun SetupScreenContent(
         
         Spacer(modifier = Modifier.height(32.dp))
         
-        SetupTextField(value = name, onValueChange = { name = it }, placeholder = "Enter your name")
+        SetupTextField(value = name, onValueChange = { if (it.length <= 64) name = it }, placeholder = "Your Name")
         
         Spacer(modifier = Modifier.height(16.dp))
         

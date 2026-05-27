@@ -36,6 +36,7 @@ import java.time.format.DateTimeFormatter
 fun PostTravelScreen(
     onBack: () -> Unit,
     onNavigateToHealthcare: () -> Unit = {},
+    onNavigateToAssessment: () -> Unit = {},
     viewModel: TravelViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -44,6 +45,7 @@ fun PostTravelScreen(
         uiState = uiState,
         onBack = onBack,
         onNavigateToHealthcare = onNavigateToHealthcare,
+        onNavigateToAssessment = onNavigateToAssessment,
         onDatesSelected = { start, end ->
             viewModel.saveAndSyncDates(start, end)
         }
@@ -56,6 +58,7 @@ fun PostTravelContent(
     uiState: com.visitbali.balitravelhealth.viewmodel.TravelUiState,
     onBack: () -> Unit,
     onNavigateToHealthcare: () -> Unit = {},
+    onNavigateToAssessment: () -> Unit = {},
     onDatesSelected: (LocalDate, LocalDate) -> Unit
 ) {
     var showRangePicker by remember { mutableStateOf(value = false) }
@@ -126,7 +129,7 @@ fun PostTravelContent(
                     title = "Health \nScreening",
                     color = Color(0xFF8CC478),
                     iconRes = R.drawable.ic_assessment,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).clickable { onNavigateToAssessment() }
                 )
                 // Placeholder for future tool
                 Box(modifier = Modifier.weight(1f))
@@ -252,6 +255,7 @@ fun PostTravelScreenPreview() {
             ),
             onBack = {},
             onNavigateToHealthcare = {},
+            onNavigateToAssessment = {},
             onDatesSelected = { _, _ -> }
         )
     }

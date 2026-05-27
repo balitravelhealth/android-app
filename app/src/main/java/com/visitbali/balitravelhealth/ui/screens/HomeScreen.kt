@@ -36,6 +36,10 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.visitbali.balitravelhealth.ui.theme.BaliTravelHealthTheme
+import com.visitbali.balitravelhealth.ui.theme.DuringTravelYellow
+import com.visitbali.balitravelhealth.ui.theme.NursingMutedRed
+import com.visitbali.balitravelhealth.ui.theme.PostTravelSage
+import com.visitbali.balitravelhealth.ui.theme.PreTravelMint
 import com.visitbali.balitravelhealth.viewmodel.HomeUiState
 import com.visitbali.balitravelhealth.viewmodel.HomeViewModel
 import kotlin.math.min
@@ -81,24 +85,6 @@ fun HomeScreenContent(
 ) {
     val scrollState = rememberScrollState()
 
-    // Permission launcher
-    val locationPermissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
-        androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        if (permissions[android.Manifest.permission.ACCESS_FINE_LOCATION] == true) {
-            onLocationPermissionGranted()
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        locationPermissionLauncher.launch(
-            arrayOf(
-                android.Manifest.permission.ACCESS_FINE_LOCATION,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        )
-    }
-
     Scaffold(
         bottomBar = { 
             BaliNavigationBar(
@@ -122,7 +108,7 @@ fun HomeScreenContent(
             onRefresh = onRefresh,
             modifier = Modifier.padding(paddingValues)
         ) {
-            Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+            Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
                 
                 // Background Header with Parallax & Blur
                 Box(
@@ -140,6 +126,11 @@ fun HomeScreenContent(
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.36f))
                     )
                     
                     // Header Overlay Text
@@ -164,7 +155,7 @@ fun HomeScreenContent(
                     // Main Rectangle Content
                     Surface(
                         modifier = Modifier.fillMaxWidth().fillMaxHeight(),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.background,
                         shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
                     ) {
                         Column(
@@ -207,7 +198,6 @@ fun HeaderContent(
     modifier: Modifier = Modifier
 ) {
     val userName = uiState.userName
-    val arrivalDate = uiState.arrivalDate
     val isInBali = uiState.isInBali
 
     ConstraintLayout(
@@ -258,12 +248,7 @@ fun HeaderContent(
             }
         )
 
-        val subTextContent = when {
-            isInBali && (uiState.daysUntilDeparture ?: Long.MAX_VALUE) <= 2 -> 
-                "You'll be leaving Bali \nin ${uiState.departureDate}"
-            isInBali -> "Enjoy your stay in Bali!"
-            else -> "You’re going to Bali \nin $arrivalDate"
-        }
+        val subTextContent = countdownText(uiState, isInBali)
 
         Text(
             text = subTextContent,
@@ -289,28 +274,28 @@ fun CardsGridContent(
         HomeCardData(
             "Pre Travel",
             "Prepare your health\nbefore traveling",
-            Color(0xFF90D1C6),
+            PreTravelMint,
             R.drawable.ic_pre_light,
             R.drawable.ic_pre_background
         ),
         HomeCardData(
             "During Travel",
             "Track your health\nwhile traveling",
-            Color(0xFFEDE075),
+            DuringTravelYellow,
             R.drawable.ic_during_light,
             R.drawable.ic_during_background
         ),
         HomeCardData(
             "Post Travel",
             "Health check-up\nafter traveling",
-            Color(0xFF8CC478),
+            PostTravelSage,
             R.drawable.ic_post_light,
             R.drawable.ic_post_background
         ),
         HomeCardData(
             "Nursing Care",
             "Get Nursing Care Service\nwhile traveling",
-            Color(0xFFBD5454),
+            NursingMutedRed,
             R.drawable.ic_nurse_light,
             R.drawable.ic_nurse_background
         )
@@ -432,7 +417,8 @@ fun BaliNavigationBar(
     var selectedItem by remember { mutableIntStateOf(initialSelectedItem) }
     
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 3.dp,
     ) {
         NavigationBarItem(
             selected = selectedItem == 0,
@@ -448,7 +434,12 @@ fun BaliNavigationBar(
                     outlineRes = R.drawable.ic_home_outline
                 )
             },
-            label = { Text("Home", style = MaterialTheme.typography.labelMedium) }
+            label = { Text("Home", style = MaterialTheme.typography.labelMedium) },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                selectedTextColor = MaterialTheme.colorScheme.primary,
+                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+            ),
         )
         NavigationBarItem(
             selected = selectedItem == 1, 
@@ -464,7 +455,12 @@ fun BaliNavigationBar(
                     outlineRes = R.drawable.ic_guide_outline
                 )
             }, 
-            label = { Text("Guide", style = MaterialTheme.typography.labelMedium) }
+            label = { Text("Guide", style = MaterialTheme.typography.labelMedium) },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                selectedTextColor = MaterialTheme.colorScheme.primary,
+                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+            ),
         )
         NavigationBarItem(
             selected = selectedItem == 2, 
@@ -479,8 +475,26 @@ fun BaliNavigationBar(
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Profile", style = MaterialTheme.typography.labelMedium) }
+            label = { Text("Profile", style = MaterialTheme.typography.labelMedium) },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                selectedTextColor = MaterialTheme.colorScheme.primary,
+                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+            ),
         )
+    }
+}
+
+private fun countdownText(uiState: HomeUiState, isInBali: Boolean): String {
+    val days = uiState.daysUntilArrival
+    return when {
+        days == null -> "Add your travel dates\nto see your countdown"
+        days > 1 -> "You're going to Bali\nin $days days"
+        days == 1L -> "You're going to Bali\ntomorrow"
+        days == 0L -> "You're arriving in Bali\ntoday"
+        days == -1L -> "You arrived in Bali\nyesterday"
+        isInBali || days < -1 -> "Enjoy your stay in Bali"
+        else -> "Add your travel dates\nto see your countdown"
     }
 }
 

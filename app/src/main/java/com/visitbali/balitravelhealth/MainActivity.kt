@@ -1,5 +1,6 @@
 package com.visitbali.balitravelhealth
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
@@ -13,14 +14,23 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.visitbali.balitravelhealth.ui.theme.BaliTravelHealthTheme
 import com.visitbali.balitravelhealth.viewmodel.SplashViewModel
+import com.visitbali.balitravelhealth.ui.screens.AssessmentScreen
+import com.visitbali.balitravelhealth.ui.screens.BasicLifeSupportDetailScreen
+import com.visitbali.balitravelhealth.ui.screens.DestinationScreen
+import com.visitbali.balitravelhealth.ui.screens.EmergencyGuideFlowScreen
+import com.visitbali.balitravelhealth.ui.screens.GuideDetailScreen
+import com.visitbali.balitravelhealth.ui.screens.HealthProfileScreen
 import com.visitbali.balitravelhealth.ui.screens.LoginScreen
+import com.visitbali.balitravelhealth.ui.screens.VaccinationScreen
 import com.visitbali.balitravelhealth.ui.screens.SetupScreen
 import com.visitbali.balitravelhealth.ui.screens.SetupTravelScreen
+import com.visitbali.balitravelhealth.ui.screens.ServiceCenterScreen
 import com.visitbali.balitravelhealth.ui.screens.HomeScreen
 import com.visitbali.balitravelhealth.ui.screens.PreTravelScreen
 import com.visitbali.balitravelhealth.ui.screens.PostTravelScreen
 import com.visitbali.balitravelhealth.ui.screens.DuringTravelScreen
 import com.visitbali.balitravelhealth.ui.screens.NursingCareScreen
+import com.visitbali.balitravelhealth.ui.screens.NursingRecordsScreen
 import com.visitbali.balitravelhealth.ui.screens.GuideScreen
 import com.visitbali.balitravelhealth.ui.screens.ProfileScreen
 import com.visitbali.balitravelhealth.viewmodel.ProfileViewModel
@@ -148,6 +158,9 @@ class MainActivity : AppCompatActivity() {
                                         popUpTo("home") { inclusive = false }
                                     }
                                 },
+                                onNavigateToHealthProfile = {
+                                    navController.navigate("health_profile")
+                                },
                                 onLoggedOut = {
                                     navController.navigate("login") {
                                         popUpTo(0) { inclusive = true }
@@ -159,7 +172,12 @@ class MainActivity : AppCompatActivity() {
                             val context = androidx.compose.ui.platform.LocalContext.current
                             val db = AppDatabase.getDatabase(context)
                             val guideViewModel: GuideViewModel = viewModel(
-                                factory = GuideViewModel.Factory(GuideRepository(db.guideItemDao()))
+                                factory = GuideViewModel.Factory(
+                                    GuideRepository(
+                                        dao = db.guideItemDao(),
+                                        api = RetrofitClient.apiService,
+                                    )
+                                )
                             )
                             GuideScreen(
                                 onNavigateToHome = {
@@ -167,7 +185,69 @@ class MainActivity : AppCompatActivity() {
                                         popUpTo("home") { inclusive = true }
                                     }
                                 },
+                                onFlowClick = { flowId ->
+                                    navController.navigate("emergency_flow/$flowId")
+                                },
+                                onGuideClick = { categoryId ->
+                                    navController.navigate("guide_detail/${Uri.encode(categoryId)}")
+                                },
                                 viewModel = guideViewModel
+                            )
+                        }
+                        composable("guide_detail/{guideId}") { backStackEntry ->
+                            val context = androidx.compose.ui.platform.LocalContext.current
+                            val db = AppDatabase.getDatabase(context)
+                            val guideViewModel: GuideViewModel = viewModel(
+                                factory = GuideViewModel.Factory(
+                                    GuideRepository(
+                                        dao = db.guideItemDao(),
+                                        api = RetrofitClient.apiService,
+                                    )
+                                )
+                            )
+                            GuideDetailScreen(
+                                categoryId = backStackEntry.arguments?.getString("guideId") ?: "CEK_NAPAS",
+                                onBack = { navController.popBackStack() },
+                                viewModel = guideViewModel,
+                            )
+                        }
+                        composable("assessment/{kategori}") { backStackEntry ->
+                            val kategori = backStackEntry.arguments?.getString("kategori") ?: "pre_travel"
+                            AssessmentScreen(
+                                kategori = kategori,
+                                onBack = { navController.popBackStack() },
+                            )
+                        }
+                        composable("vaccination") {
+                            VaccinationScreen(
+                                onBack = { navController.popBackStack() },
+                            )
+                        }
+                        composable("health_profile") {
+                            HealthProfileScreen(
+                                onBack = { navController.popBackStack() },
+                            )
+                        }
+                        composable("service_center") {
+                            ServiceCenterScreen(
+                                onBack = { navController.popBackStack() },
+                            )
+                        }
+                        composable("destinations") {
+                            DestinationScreen(
+                                onBack = { navController.popBackStack() },
+                            )
+                        }
+                        composable("emergency_flows") {
+                            EmergencyGuideFlowScreen(
+                                onBack = { navController.popBackStack() },
+                            )
+                        }
+                        composable("emergency_flow/{flowId}") { backStackEntry ->
+                            val flowId = backStackEntry.arguments?.getString("flowId")?.toIntOrNull()
+                            EmergencyGuideFlowScreen(
+                                initialFlowId = flowId,
+                                onBack = { navController.popBackStack() },
                             )
                         }
                         composable("pre_travel") {
@@ -175,20 +255,35 @@ class MainActivity : AppCompatActivity() {
                                 onBack = { navController.popBackStack() },
                                 onNavigateToHealthcare = {
                                     navController.navigate("healthcare")
-                                }
+                                },
+                                onNavigateToAssessment = {
+                                    navController.navigate("assessment/pre_travel")
+                                },
+                                onNavigateToVaccination = {
+                                    navController.navigate("vaccination")
+                                },
+                                onNavigateToDestinations = {
+                                    navController.navigate("destinations")
+                                },
+                                onNavigateToServices = {
+                                    navController.navigate("service_center")
+                                },
                             )
                         }
                         composable("post_travel") {
                             PostTravelScreen(
-                                onBack = { navController.popBackStack() }
+                                onBack = { navController.popBackStack() },
+                                onNavigateToAssessment = {
+                                    navController.navigate("assessment/post_travel")
+                                },
                             )
                         }
                         composable("nursing_care") {
                             val context = androidx.compose.ui.platform.LocalContext.current
                             val db = AppDatabase.getDatabase(context)
                             val repository = NurseRepository(
-                                api = RetrofitClient.nurseApiService,
-                                nurseDao = db.nurseDao()
+                                api = RetrofitClient.apiService,
+                                nurseDao = db.nurseDao(),
                             )
                             val nursingViewModel: NursingCareViewModel = viewModel(
                                 factory = NursingCareViewModel.Factory(repository)
@@ -196,6 +291,9 @@ class MainActivity : AppCompatActivity() {
                             NursingCareScreen(
                                 viewModel = nursingViewModel,
                                 onBack = { navController.popBackStack() },
+                                onRecordsClick = {
+                                    navController.navigate("nursing_records")
+                                },
                                 onNurseClick = { nurse ->
                                     val nurseJson = java.net.URLEncoder.encode(Gson().toJson(nurse), "UTF-8")
                                     navController.navigate("nurse_detail/$nurseJson")
@@ -211,8 +309,8 @@ class MainActivity : AppCompatActivity() {
                             val context = androidx.compose.ui.platform.LocalContext.current
                             val db = AppDatabase.getDatabase(context)
                             val nurseRepository = NurseRepository(
-                                api = RetrofitClient.nurseApiService,
-                                nurseDao = db.nurseDao()
+                                api = RetrofitClient.apiService,
+                                nurseDao = db.nurseDao(),
                             )
                             val nursingViewModel: NursingCareViewModel = viewModel(
                                 factory = NursingCareViewModel.Factory(nurseRepository)
@@ -246,8 +344,25 @@ class MainActivity : AppCompatActivity() {
                                 onSeeMoreFacilities = {
                                     navController.navigate("healthcare")
                                 },
+                                onNavigateToEmergencyFlows = {
+                                    navController.navigate("emergency_flows")
+                                },
+                                onNavigateToBlsDetail = { itemId ->
+                                    navController.navigate("bls_detail/$itemId")
+                                },
                                 viewModel = healthcareViewModel,
                                 lifeSupportViewModel = lifeSupportViewModel
+                            )
+                        }
+                        composable("nursing_records") {
+                            NursingRecordsScreen(
+                                onBack = { navController.popBackStack() },
+                            )
+                        }
+                        composable("bls_detail/{itemId}") { backStackEntry ->
+                            BasicLifeSupportDetailScreen(
+                                itemId = backStackEntry.arguments?.getString("itemId") ?: "cpr",
+                                onBack = { navController.popBackStack() },
                             )
                         }
                         composable("healthcare") {

@@ -3,54 +3,70 @@ package com.visitbali.balitravelhealth.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import com.visitbali.balitravelhealth.BuildConfig
 import androidx.lifecycle.viewModelScope
+import com.visitbali.balitravelhealth.BuildConfig
 import com.visitbali.balitravelhealth.data.api.RetrofitClient
-import com.visitbali.balitravelhealth.data.api.SaveProfileRequest
+import com.visitbali.balitravelhealth.data.dto.CreateHealthProfileRequest
+import com.visitbali.balitravelhealth.data.dto.CreateTravelerProfileRequest
 import com.visitbali.balitravelhealth.data.pref.UserPreferences
-import com.visitbali.balitravelhealth.data.pref.UserProfile
+import com.visitbali.balitravelhealth.data.repository.HealthProfileRepository
+import com.visitbali.balitravelhealth.data.repository.TravelerProfileRepository
+import com.visitbali.balitravelhealth.data.util.ProfileFormatters
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class SetupViewModel(application: Application) : AndroidViewModel(application) {
-    private val userPreferences = UserPreferences(application)
-    private val apiService = RetrofitClient.apiService
 
-    fun saveUserProfile(name: String, country: String, dob: String, gender: String, onComplete: () -> Unit) {
+    private val preferences = UserPreferences(application)
+    private val travelerProfileRepository = TravelerProfileRepository(
+        RetrofitClient.apiService,
+        preferences,
+    )
+    private val healthProfileRepository = HealthProfileRepository(RetrofitClient.apiService)
+
+    fun saveUserProfile(
+        name: String,
+        country: String,
+        dob: String,
+        gender: String,
+        onComplete: () -> Unit,
+    ) {
         viewModelScope.launch {
-            val currentEmail = userPreferences.userProfile.first().email
-            val idToken      = userPreferences.idToken.first()
+            val dobIso = ProfileFormatters.toApiDate(dob)
+            val apiGender = ProfileFormatters.toApiGender(gender)
 
-            val dobForServer = try {
-                val input  = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
-                val output = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-                output.format(input.parse(dob)!!)
-            } catch (e: Exception) { dob }
-
-            val profile = UserProfile(
-                email = currentEmail, name = name,
-                country = country, dob = dob,
-                gender = gender, isLoggedIn = true, isRegistered = true
-            )
-            userPreferences.saveUserProfile(profile)
-
-            try {
-                val response = apiService.saveUserProfile(
-                    request = SaveProfileRequest(
-                        idToken  = idToken,
-                        email    = currentEmail,
-                        name     = name,
-                        country  = country,
-                        dob      = dobForServer,
-                        gender   = gender
-                    )
+            // Save all fields locally first
+            preferences.saveUserProfile(
+                preferences.userProfile.first().copy(
+                        name = name,
+                        country = country,
+                        dob = dob,
+                        gender = ProfileFormatters.toDisplayGender(apiGender),
+                        isLoggedIn = true,
+                        isProfileComplete = true,
                 )
-                // Simpan session token dari response
-                if (response.success && response.session_token != null) {
-                    userPreferences.saveSessionToken(response.session_token)
+            )
+
+            // POST traveler profile
+            travelerProfileRepository.createProfile(
+                CreateTravelerProfileRequest(
+                    namaLengkap = name,
+                    tanggalLahir = dobIso.takeIf { it.isNotEmpty() },
+                )
+            ).onFailure { e ->
+                if (BuildConfig.DEBUG) Log.e("SetupViewModel", "Failed to create traveler profile: ${e.message}")
+            }
+
+            // POST health profile (gender + dob)
+            if (gender.isNotEmpty() || dobIso.isNotEmpty()) {
+                healthProfileRepository.createProfile(
+                    CreateHealthProfileRequest(
+                        tanggalLahir = dobIso.takeIf { it.isNotEmpty() },
+                        jenisKelamin = apiGender.takeIf { it.isNotEmpty() },
+                    )
+                ).onFailure { e ->
+                    if (BuildConfig.DEBUG) Log.e("SetupViewModel", "Failed to create health profile: ${e.message}")
                 }
-            } catch (e: Exception) {
-                if (BuildConfig.DEBUG) Log.e("SetupViewModel", "Failed to sync: ${e.message}")
             }
 
             onComplete()
@@ -59,8 +75,9 @@ class SetupViewModel(application: Application) : AndroidViewModel(application) {
 
     fun signOut(onComplete: () -> Unit) {
         viewModelScope.launch {
-            userPreferences.clear()
+            preferences.clear()
             onComplete()
         }
     }
+
 }

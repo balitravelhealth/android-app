@@ -38,10 +38,8 @@
 -keep class com.visitbali.balitravelhealth.data.api.** { *; }
 -keep class com.visitbali.balitravelhealth.data.remote.** { *; }
 
-# Google Credentials / Sign-In
--keep class com.google.android.libraries.identity.** { *; }
--keep class androidx.credentials.** { *; }
--dontwarn com.google.android.libraries.identity.**
+# Google Sign-In
+-keep class com.google.android.gms.auth.api.signin.** { *; }
 
 # Kotlin Coroutines
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}

@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -42,6 +43,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun ProfileScreen(
     onNavigateToHome: () -> Unit = {},
     onNavigateToGuide: () -> Unit = {},
+    onNavigateToHealthProfile: () -> Unit = {},
     onLoggedOut: () -> Unit = {},
     viewModel: ProfileViewModel = viewModel()
 ) {
@@ -87,7 +89,8 @@ fun ProfileScreen(
                 onUpdateCountry = { viewModel.updateCountry(it) },
                 onUpdateGender = { viewModel.updateGender(it) },
                 onPhotoClick = { if (uiState.isEditMode) showPhotoPickerOptions = true },
-                onLogoutClick = { showLogoutDialog = true }
+                onLogoutClick = { showLogoutDialog = true },
+                onHealthProfileClick = onNavigateToHealthProfile,
             )
             
             if (showPhotoPickerOptions) {
@@ -146,131 +149,189 @@ fun ProfileContent(
     onUpdateCountry: (String) -> Unit,
     onUpdateGender: (String) -> Unit,
     onPhotoClick: () -> Unit,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    onHealthProfileClick: () -> Unit = {},
 ) {
-    Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
-        // Header Image
-        Image(
-            painter = painterResource(id = R.drawable.bali_default),
-            contentDescription = null,
-            modifier = Modifier.fillMaxWidth().height(300.dp),
-            contentScale = ContentScale.Crop
-        )
-
-        // Top Controls
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 48.dp, start = 16.dp, end = 16.dp),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = onLogoutClick,
-                modifier = Modifier.background(Color.White.copy(alpha = 0.8f), CircleShape)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp, vertical = 28.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(90.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .border(3.dp, Color.White, CircleShape)
+                    .clickable { onPhotoClick() },
+                contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout", tint = Color.Black)
+                if (uiState.profilePictureUri != null) {
+                    AsyncImage(
+                        model = uiState.profilePictureUri,
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Text(
+                        text = initials(uiState.name),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
             }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(uiState.name.ifBlank { "Traveler" }, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                val details = listOfNotNull(
+                    ageText(uiState.dob).takeIf { it.isNotBlank() },
+                    uiState.country.takeIf { it.isNotBlank() },
+                ).joinToString(" • ")
+                Text(details.ifBlank { "Complete your profile" }, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            AssistChip(
+                onClick = onEditToggle,
+                label = { Text(if (uiState.isEditMode) "Editing" else "Edit") },
+                leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp)) },
+            )
         }
 
-        // Main Card
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 240.dp, start = 24.dp, end = 24.dp, bottom = 48.dp)
-                .fillMaxHeight(),
-            shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 64.dp, bottom = 24.dp)
-            ) {
-                ProfileField(label = "Name", value = uiState.name, isEditable = uiState.isEditMode, onValueChange = onUpdateName)
-                ProfileField(label = "Date of Birth", value = uiState.dob, isEditable = uiState.isEditMode, onValueChange = onUpdateDob)
-                ProfileField(label = "Nationality", value = uiState.country, isEditable = uiState.isEditMode, onValueChange = onUpdateCountry)
-                ProfileField(label = "Gender", value = uiState.gender, isEditable = uiState.isEditMode, onValueChange = onUpdateGender)
+        Spacer(modifier = Modifier.height(28.dp))
 
-                Spacer(modifier = Modifier.height(20.dp))
-
-                if (uiState.isEditMode) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        OutlinedButton(
-                            onClick = onCancel,
-                            modifier = Modifier.weight(1f).height(56.dp),
-                            shape = RoundedCornerShape(28.dp)
-                        ) {
+        if (uiState.isEditMode) {
+            Card(shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+                Column(Modifier.padding(20.dp)) {
+                    ProfileField(label = "Name", value = uiState.name, isEditable = true, onValueChange = onUpdateName)
+                    ProfileField(label = "Date of Birth", value = uiState.dob, isEditable = true, onValueChange = onUpdateDob)
+                    ProfileField(label = "Country of Residence", value = uiState.country, isEditable = true, onValueChange = onUpdateCountry)
+                    ProfileField(label = "Gender", value = uiState.gender, isEditable = true, onValueChange = onUpdateGender)
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                        OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f).height(52.dp), shape = RoundedCornerShape(26.dp)) {
                             Text("Cancel")
                         }
-                        Button(
-                            onClick = onSave,
-                            modifier = Modifier.weight(1f).height(56.dp),
-                            shape = RoundedCornerShape(28.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-                        ) {
-                            if (uiState.isLoading) {
-                                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-                            } else {
-                                Text("Save")
-                            }
+                        Button(onClick = onSave, modifier = Modifier.weight(1f).height(52.dp), shape = RoundedCornerShape(26.dp)) {
+                            if (uiState.isLoading) CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp)) else Text("Save")
                         }
                     }
-                } else {
-                    Button(
-                        onClick = onEditToggle,
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        shape = RoundedCornerShape(28.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-                    ) {
-                        Text("Edit Profile")
+                }
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+        }
+
+        Text("Account", fontWeight = FontWeight.Bold, fontSize = 22.sp)
+        Spacer(modifier = Modifier.height(12.dp))
+        Card(shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+            Row(modifier = Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text("Email", modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(uiState.email.ifBlank { "Not available" }, maxLines = 1, color = MaterialTheme.colorScheme.onSurface)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Card(
+            shape = RoundedCornerShape(22.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color(0xFFE85745), Color(0xFF9F2C22))
+                        )
+                    )
+                    .padding(22.dp)
+            ) {
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(painterResource(R.drawable.gapura), contentDescription = null, modifier = Modifier.size(38.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text("Bali Travel Health", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    }
+                    Spacer(modifier = Modifier.height(28.dp))
+                    Icon(
+                        imageVector = if (uiState.hasCompletedHealthRiskAssessment) {
+                            Icons.Default.Verified
+                        } else {
+                            Icons.Default.Warning
+                        },
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(34.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        uiState.name.ifBlank { "Traveler" },
+                        color = Color.White.copy(alpha = 0.82f),
+                        fontSize = 14.sp,
+                    )
+                    Text(
+                        if (uiState.hasCompletedHealthRiskAssessment) {
+                            "Cleared for Bali!"
+                        } else {
+                            "Please take Health Risk Assessment first"
+                        },
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                    Spacer(modifier = Modifier.height(18.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TravelDatePill(uiState.arrivalDate ?: "Arrival")
+                        TravelDatePill(uiState.departureDate ?: "Departure")
                     }
                 }
             }
         }
 
-        // Profile Picture (Floating over card)
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 180.dp)
-                .size(120.dp)
-                .clip(CircleShape)
-                .background(Color.LightGray)
-                .border(4.dp, Color.White, CircleShape)
-                .clickable { onPhotoClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            if (uiState.profilePictureUri != null) {
-                AsyncImage(
-                    model = uiState.profilePictureUri,
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_nurse_light), // Placeholder
-                    contentDescription = null,
-                    modifier = Modifier.size(60.dp),
-                    tint = Color.Gray
-                )
-            }
-            
-            if (uiState.isEditMode) {
-                Box(
-                    modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(Icons.Default.CameraAlt, contentDescription = null, tint = Color.White)
-                }
-            }
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedButton(onClick = onHealthProfileClick, modifier = Modifier.fillMaxWidth().height(54.dp), shape = RoundedCornerShape(27.dp)) {
+            Icon(Icons.Default.Favorite, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Health Profile")
+        }
+
+        TextButton(onClick = onLogoutClick, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+            Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Sign Out", color = MaterialTheme.colorScheme.primary)
         }
     }
+}
+
+@Composable
+private fun TravelDatePill(text: String) {
+    Surface(
+        shape = RoundedCornerShape(50),
+        color = Color.White.copy(alpha = 0.18f),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.26f)),
+    ) {
+        Text(
+            text = text,
+            color = Color.White,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+        )
+    }
+}
+
+private fun initials(name: String): String {
+    val parts = name.trim().split(Regex("\\s+")).filter { it.isNotBlank() }
+    return parts.take(2).joinToString("") { it.first().uppercase() }.ifBlank { "?" }
+}
+
+private fun ageText(dob: String): String {
+    val iso = com.visitbali.balitravelhealth.data.util.ProfileFormatters.toApiDate(dob)
+    return runCatching {
+        val birth = java.time.LocalDate.parse(iso)
+        "${java.time.Period.between(birth, java.time.LocalDate.now()).years} years"
+    }.getOrDefault("")
 }
 
 @Composable

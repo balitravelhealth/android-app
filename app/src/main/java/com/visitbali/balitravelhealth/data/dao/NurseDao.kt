@@ -10,14 +10,14 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NurseDao {
-    @Query("SELECT * FROM nurses WHERE isActive = 1 ORDER BY fullName")
+    @Query("SELECT * FROM nurses WHERE isActive = 1 ORDER BY nama")
     fun getActiveNurses(): Flow<List<Nurse>>
 
-    @Query("SELECT * FROM nurses WHERE isActive = 1 ORDER BY fullName")
+    @Query("SELECT * FROM nurses WHERE isActive = 1 ORDER BY nama")
     suspend fun getActiveNursesSnapshot(): List<Nurse>
 
     @Query("SELECT * FROM nurses WHERE id = :id LIMIT 1")
-    suspend fun getById(id: String): Nurse?
+    suspend fun getById(id: Int): Nurse?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(nurses: List<Nurse>)

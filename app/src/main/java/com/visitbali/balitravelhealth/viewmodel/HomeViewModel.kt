@@ -12,6 +12,7 @@ import com.visitbali.balitravelhealth.data.database.AppDatabase
 import com.visitbali.balitravelhealth.data.pref.UserPreferences
 import com.visitbali.balitravelhealth.data.repository.AppContentSyncRepository
 import com.visitbali.balitravelhealth.data.repository.TravelRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,6 +28,7 @@ data class HomeUiState(
     val userName: String = "",
     val arrivalDate: String = "",
     val departureDate: String = "",
+    val daysUntilArrival: Long? = null,
     val daysUntilDeparture: Long? = null,
     val isInBali: Boolean = false,
     val isRefreshing: Boolean = false,
@@ -48,12 +50,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val db = AppDatabase.getDatabase(application)
         contentSyncRepository = AppContentSyncRepository(
             context = application,
-            contentApi = RetrofitClient.contentApiService,
-            nurseApi = RetrofitClient.nurseApiService,
-            healthcareFacilityDao = db.healthcareFacilityDao(),
+            api = RetrofitClient.apiService,
             guideItemDao = db.guideItemDao(),
-            lifeSupportItemDao = db.lifeSupportItemDao(),
-            nurseDao = db.nurseDao()
+            nurseDao = db.nurseDao(),
         )
         observeUserData()
         refreshData(syncContent = false)
@@ -67,12 +66,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 travelRepository.departureDate,
                 _isInBali
             ) { profile, arrival, departure, inBali ->
+                val daysUntilArrival = calculateDaysUntil(arrival)
                 val daysUntilDeparture = calculateDaysUntil(departure)
                 
                 HomeUiState(
                     userName = profile.name.ifEmpty { "Traveler" },
                     arrivalDate = arrival ?: "Not set",
                     departureDate = departure ?: "Not set",
+                    daysUntilArrival = daysUntilArrival,
                     daysUntilDeparture = daysUntilDeparture,
                     isInBali = inBali,
                     isLoading = false
@@ -124,11 +125,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 Priority.PRIORITY_BALANCED_POWER_ACCURACY,
                 null
             ).await()
-            
+
             if (locationResult != null) {
-                val inBali = checkIfInBali(locationResult)
-                _isInBali.value = inBali
+                _isInBali.value = checkIfInBali(locationResult)
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             _isInBali.value = false
         }

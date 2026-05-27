@@ -1,5 +1,7 @@
 package com.visitbali.balitravelhealth.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,6 +34,11 @@ fun LoginScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        viewModel.onGoogleSignInResult(result.data)
+    }
 
     LaunchedEffect(uiState) {
         when (uiState) {
@@ -79,13 +86,6 @@ fun LoginScreen(
                     .align(Alignment.TopStart)
             )
 
-            if (uiState is LoginUiState.Loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
-                    color = Color.White
-                )
-            }
-
             // Bottom Buttons
             Column(
                 modifier = Modifier
@@ -96,7 +96,9 @@ fun LoginScreen(
             ) {
                 // Google Button
                 Button(
-                    onClick = { viewModel.onGoogleSignInClick(context) },
+                    onClick = {
+                        googleSignInLauncher.launch(viewModel.getGoogleSignInIntent(context))
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
@@ -121,6 +123,18 @@ fun LoginScreen(
                             fontWeight = FontWeight.Medium
                         )
                     }
+                }
+
+            }
+
+            if (uiState is LoginUiState.Loading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.62f)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator(color = Color.White)
                 }
             }
         }

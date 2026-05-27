@@ -32,13 +32,7 @@ android {
         buildConfigField(
             "String",
             "GOOGLE_WEB_CLIENT_ID",
-            "\"${localProps.getProperty("GOOGLE_WEBCLIENT", "")}\""
-        )
-
-        buildConfigField(
-            "String",
-            "OTHER_API_BASE_URL",
-            "\"${localProps.getProperty("OTHER_API_BASE_URL", "https://api-placeholder.balihealth.me/")}\""
+            "\"${localProps.getProperty("GOOGLE_WEB_CLIENT_ID", "")}\""
         )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -112,10 +106,8 @@ dependencies {
     // Icons
     implementation("androidx.compose.material:material-icons-extended")
 
-    // Google Sign-In with Credential Manager
-    implementation(libs.androidx.credentials)
-    implementation(libs.androidx.credentials.play.services.auth)
-    implementation(libs.googleid)
+    // Google Sign-In
+    implementation(libs.play.services.auth)
 
     // Country
     implementation("com.hbb20:android-country-picker:0.0.7")

@@ -10,10 +10,13 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GuideItemDao {
-    @Query("SELECT * FROM guide_items ORDER BY sortOrder, title")
+    @Query("SELECT * FROM guide_items ORDER BY kategori, langkah")
     fun getAll(): Flow<List<GuideItem>>
 
-    @Query("SELECT * FROM guide_items ORDER BY sortOrder, title")
+    @Query("SELECT * FROM guide_items WHERE kategori = :kategori ORDER BY langkah")
+    fun getByKategori(kategori: String): Flow<List<GuideItem>>
+
+    @Query("SELECT * FROM guide_items ORDER BY kategori, langkah")
     suspend fun getAllSnapshot(): List<GuideItem>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

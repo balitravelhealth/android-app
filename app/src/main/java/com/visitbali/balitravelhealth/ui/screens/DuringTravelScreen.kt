@@ -2,7 +2,6 @@ package com.visitbali.balitravelhealth.ui.screens
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,13 +12,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Accessibility
+import androidx.compose.material.icons.filled.Air
+import androidx.compose.material.icons.filled.ElectricBolt
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.SupportAgent
+import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,11 +47,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.visitbali.balitravelhealth.data.model.BasicLifeSupportCatalog
+import com.visitbali.balitravelhealth.data.model.BasicLifeSupportItem
+import com.visitbali.balitravelhealth.data.model.BlsIcon
 import com.visitbali.balitravelhealth.R
 import com.visitbali.balitravelhealth.data.model.FacilityType
 import com.visitbali.balitravelhealth.data.model.HealthcareFacility
-import com.visitbali.balitravelhealth.data.model.LifeSupportItem
 import com.visitbali.balitravelhealth.ui.theme.BaliTravelHealthTheme
+import com.visitbali.balitravelhealth.ui.theme.BlsBlue
+import com.visitbali.balitravelhealth.ui.theme.HealthcareRed
 import com.visitbali.balitravelhealth.viewmodel.FacilityWithDistance
 import com.visitbali.balitravelhealth.viewmodel.HealthcareFacilityViewModel
 import com.visitbali.balitravelhealth.viewmodel.LifeSupportViewModel
@@ -57,7 +67,7 @@ import java.util.Locale
  */
 
 private val FacilityContainerColor = Color(0xFFF0F0F0)
-private val LifeSupportCardColor = Color(0xFF136DD3)
+private val LifeSupportCardColor = BlsBlue
 private val SubtitleColor = Color(0x75383838) // rgba(56,56,56,0.46)
 private val SecondaryTextColor = Color(0xFF525252)
 
@@ -66,17 +76,19 @@ private val SecondaryTextColor = Color(0xFF525252)
 fun DuringTravelScreen(
     onBack: () -> Unit,
     onSeeMoreFacilities: () -> Unit = {},
+    onNavigateToEmergencyFlows: () -> Unit = {},
+    onNavigateToBlsDetail: (String) -> Unit = {},
     viewModel: HealthcareFacilityViewModel,
     lifeSupportViewModel: LifeSupportViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val lifeSupportItems by lifeSupportViewModel.items.collectAsState()
     
     DuringTravelContent(
         onBack = onBack,
         onSeeMoreFacilities = onSeeMoreFacilities,
+        onNavigateToEmergencyFlows = onNavigateToEmergencyFlows,
+        onNavigateToBlsDetail = onNavigateToBlsDetail,
         facilities = uiState.facilities.take(4),
-        lifeSupportItems = lifeSupportItems,
     )
 }
 
@@ -85,8 +97,9 @@ fun DuringTravelScreen(
 private fun DuringTravelContent(
     onBack: () -> Unit,
     onSeeMoreFacilities: () -> Unit,
+    onNavigateToEmergencyFlows: () -> Unit,
+    onNavigateToBlsDetail: (String) -> Unit,
     facilities: List<FacilityWithDistance>,
-    lifeSupportItems: List<LifeSupportItem>,
 ) {
     var selectedFacility by remember { mutableStateOf<HealthcareFacility?>(null) }
 
@@ -154,7 +167,60 @@ private fun DuringTravelContent(
                 // Basic Life Support section
                 SectionHeader(text = "Basic Life Support")
                 Spacer(modifier = Modifier.height(16.dp))
-                LifeSupportGrid(items = lifeSupportItems)
+                
+                // BLS Emergency Flow Card
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                    shape = RoundedCornerShape(22.dp),
+                    colors = CardDefaults.cardColors(containerColor = HealthcareRed),
+                    onClick = onNavigateToEmergencyFlows
+                ) {
+                    Row(
+                        modifier = Modifier.padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color.White.copy(alpha = 0.2f)),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.medkit),
+                                contentDescription = null,
+                                modifier = Modifier.size(28.dp),
+                                tint = Color.White,
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "EMERGENCY GUIDE",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White.copy(alpha = 0.8f),
+                                letterSpacing = 1.sp
+                            )
+                            Text(
+                                text = "Basic Life Support Guide",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = Color.White,
+                        )
+                    }
+                }
+
+                LifeSupportGrid(
+                    items = BasicLifeSupportCatalog.items,
+                    onItemClick = onNavigateToBlsDetail,
+                )
             }
         }
 
@@ -402,11 +468,20 @@ private fun HealthFacilitySection(
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 15.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            facilities.forEach { item ->
-                HealthFacilityRow(
-                    item = item,
-                    onClick = { onFacilityClick(item.facility) }
+            if (facilities.isEmpty()) {
+                Text(
+                    text = "No facilities loaded yet",
+                    modifier = Modifier.padding(18.dp),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
                 )
+            } else {
+                facilities.forEach { item ->
+                    HealthFacilityRow(
+                        item = item,
+                        onClick = { onFacilityClick(item.facility) }
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(2.dp))
@@ -516,7 +591,10 @@ private fun HealthFacilityRow(
 }
 
 @Composable
-private fun LifeSupportGrid(items: List<LifeSupportItem>) {
+private fun LifeSupportGrid(
+    items: List<BasicLifeSupportItem>,
+    onItemClick: (String) -> Unit,
+) {
     val rows = items.chunked(2)
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         rows.forEach { rowItems ->
@@ -527,7 +605,8 @@ private fun LifeSupportGrid(items: List<LifeSupportItem>) {
                 rowItems.forEach { item ->
                     LifeSupportCard(
                         item = item,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = { onItemClick(item.id) },
                     )
                 }
                 if (rowItems.size == 1) {
@@ -540,22 +619,30 @@ private fun LifeSupportGrid(items: List<LifeSupportItem>) {
 
 @Composable
 private fun LifeSupportCard(
-    item: LifeSupportItem,
-    modifier: Modifier = Modifier
+    item: BasicLifeSupportItem,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
 ) {
     Surface(
         modifier = modifier
-            .height(110.dp)
-            .clickable { /* TODO: handle life-support navigation */ },
+            .aspectRatio(1.05f)
+            .clickable(onClick = onClick),
         color = LifeSupportCardColor,
         shape = RoundedCornerShape(22.dp)
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp, vertical = 14.dp),
-            contentAlignment = Alignment.BottomStart
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.Start,
         ) {
+            Icon(
+                blsIcon(item.icon),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(32.dp),
+            )
             Text(
                 text = item.title,
                 fontFamily = FontFamily(Font(R.font.inter_font)),
@@ -568,8 +655,69 @@ private fun LifeSupportCard(
     }
 }
 
-private val sampleLifeSupport = List(8) {
-    LifeSupportItem(id = it.toString(), title = "Placeholder ${it + 1}", sortOrder = it)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BasicLifeSupportDetailScreen(
+    itemId: String,
+    onBack: () -> Unit,
+) {
+    val item = BasicLifeSupportCatalog.find(itemId) ?: BasicLifeSupportCatalog.items.first()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(item.title) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Surface(
+                modifier = Modifier.size(128.dp),
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primaryContainer,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        blsIcon(item.icon),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(72.dp),
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(item.title, fontSize = 30.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "Step-by-step guidance coming soon.",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+private fun blsIcon(icon: BlsIcon) = when (icon) {
+    BlsIcon.Heart -> Icons.Default.Favorite
+    BlsIcon.Wind -> Icons.Default.Air
+    BlsIcon.Bandage -> Icons.Default.MedicalServices
+    BlsIcon.Flame -> Icons.Default.LocalFireDepartment
+    BlsIcon.Fall -> Icons.Default.Accessibility
+    BlsIcon.Shock -> Icons.Default.ElectricBolt
 }
 
 @Preview(showBackground = true, heightDp = 1200)
@@ -595,8 +743,9 @@ private fun DuringTravelScreenPreview() {
         DuringTravelContent(
             onBack = {},
             onSeeMoreFacilities = {},
+            onNavigateToEmergencyFlows = {},
+            onNavigateToBlsDetail = {},
             facilities = mockFacilities,
-            lifeSupportItems = sampleLifeSupport,
         )
     }
 }
