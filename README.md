@@ -16,7 +16,7 @@ Bali Travel Health helps travellers stay safe before, during, and after their tr
 | **Nursing Care** | Browse nurses in Bali, book appointments, view nursing records |
 | **Offline Support** | Local Room database cache for facilities, nurses, guides, and life support content |
 | **Account & Profile** | Google Sign-In, traveller profile, health profile, local preference storage |
-| **Localisation** | English, Indonesian, Arabic, Chinese, Dutch, French, German, Hindi, Italian, Japanese, Korean, Russian, and Spanish |
+| **Localisation** | English & Indonesian |
 
 ---
 
