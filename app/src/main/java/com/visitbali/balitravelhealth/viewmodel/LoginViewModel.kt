@@ -42,7 +42,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.value = LoginUiState.Loading
         val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .requestIdToken("779721266536-an0g84psqn5b7fc8name2qbgajtpgih3.apps.googleusercontent.com")
+            .requestIdToken("779721266536-1eg8ebnmgvo82ej2hmdlppsbf7goc132.apps.googleusercontent.com")
             .build()
         return GoogleSignIn.getClient(context, options).signInIntent
     }

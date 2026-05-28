@@ -16,7 +16,7 @@ Bali Travel Health helps travellers stay safe before, during, and after their tr
 | **Nursing Care** | Browse nurses in Bali, book appointments, view nursing records |
 | **Offline Support** | Local Room database cache for facilities, nurses, guides, and life support content |
 | **Account & Profile** | Google Sign-In, traveller profile, health profile, local preference storage |
-| **Localisation** | English, Indonesian, Arabic, Chinese, Dutch, French, German, Hindi, Italian, Japanese, Korean, Russian, and Spanish |
+| **Localisation** | English & Indonesian |
 
 ---
 
@@ -161,7 +161,6 @@ gradle/            Gradle wrapper and version catalog
 | **Google Play Services Location** | Location-based Bali travel context |
 | **Google Maps / Maps Compose** | Healthcare facility map experience |
 | **Coil** | Image and GIF loading |
-| **Lottie Compose** | App animations |
 
 ---
 
@@ -172,7 +171,6 @@ gradle/            Gradle wrapper and version catalog
 - Authentication/session data is stored locally with Android DataStore.
 - Facility, guide, nurse, and life support content can be cached locally with Room.
 - Location permission is used for Bali travel context and healthcare facility features.
-- Network requests are sent to the Bali Travel Health backend: `https://backend.balihealth.me/`.
 
 ---
 
