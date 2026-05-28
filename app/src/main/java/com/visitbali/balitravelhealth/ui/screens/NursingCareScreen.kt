@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -125,7 +126,7 @@ private fun NursingCareContent(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.cd_back),
                             tint = Color.Black,
                         )
                     }
@@ -146,20 +147,20 @@ private fun NursingCareContent(
                     .padding(horizontal = 24.dp),
             ) {
                 Text(
-                    text = "Nursing Care Service",
+                    text = stringResource(R.string.nursing_care_title),
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
                 )
                 TextButton(onClick = onRecordsClick, modifier = Modifier.align(Alignment.Start)) {
-                    Text("View care records")
+                    Text(stringResource(R.string.nursing_care_view_records))
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 if (latestRecord != null) {
                     Text(
-                        text = "Your Appointment",
+                        text = stringResource(R.string.nursing_care_your_appointment),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black,
@@ -171,7 +172,7 @@ private fun NursingCareContent(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             CircularProgressIndicator()
                             Spacer(modifier = Modifier.height(12.dp))
-                            Text("Loading nurses...", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.nursing_care_loading_nurses), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 } else if (error != null && nurses.isEmpty()) {
@@ -179,7 +180,7 @@ private fun NursingCareContent(
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(24.dp)) {
                             Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(54.dp))
                             Spacer(modifier = Modifier.height(12.dp))
-                            Text("Couldn't load nurses", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            Text(stringResource(R.string.nursing_care_error_loading), fontWeight = FontWeight.Bold, fontSize = 18.sp)
                             Text(text = error, color = Color.Gray, textAlign = TextAlign.Center)
                         }
                     }
@@ -188,8 +189,8 @@ private fun NursingCareContent(
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(24.dp)) {
                             Icon(Icons.Default.MedicalServices, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(54.dp))
                             Spacer(modifier = Modifier.height(12.dp))
-                            Text("No nurses available", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                            Text("Pull down to refresh, or check back soon.", color = Color.Gray, textAlign = TextAlign.Center)
+                            Text(stringResource(R.string.nursing_care_no_nurses), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            Text(stringResource(R.string.nursing_care_pull_to_refresh), color = Color.Gray, textAlign = TextAlign.Center)
                         }
                     }
                 } else {
@@ -240,7 +241,7 @@ fun LatestRecordCard(record: NursingRecord) {
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = "Nursing Record",
+                    text = stringResource(R.string.nursing_care_record_label),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
@@ -265,7 +266,7 @@ fun LatestRecordCard(record: NursingRecord) {
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
-                    Text(text = "Visit Date", fontSize = 14.sp, color = Color.Gray)
+                    Text(text = stringResource(R.string.nursing_care_visit_date), fontSize = 14.sp, color = Color.Gray)
                     Text(text = record.tanggalKunjungan, fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
                 }
             }
@@ -274,13 +275,13 @@ fun LatestRecordCard(record: NursingRecord) {
                 Spacer(modifier = Modifier.height(16.dp))
                 HorizontalDivider(color = Color(0xFFF0F0F0))
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "Assessment", fontSize = 14.sp, color = Color.Gray)
+                Text(text = stringResource(R.string.nursing_care_assessment), fontSize = 14.sp, color = Color.Gray)
                 Text(text = record.nursingAssessment, fontSize = 15.sp, color = Color.Black)
             }
 
             if (!record.nursingDiagnosis.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(text = "Diagnosis", fontSize = 14.sp, color = Color.Gray)
+                Text(text = stringResource(R.string.nursing_care_diagnosis), fontSize = 14.sp, color = Color.Gray)
                 Text(text = record.nursingDiagnosis, fontSize = 15.sp, color = Color.Black)
             }
         }

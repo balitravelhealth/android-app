@@ -1,57 +1,61 @@
 package com.visitbali.balitravelhealth.ui.screens
 
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Vaccines
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.visitbali.balitravelhealth.R
 import com.visitbali.balitravelhealth.ui.theme.BaliTravelHealthTheme
+import com.visitbali.balitravelhealth.viewmodel.TravelUiState
 import com.visitbali.balitravelhealth.viewmodel.TravelViewModel
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PreTravelScreen(
     onBack: () -> Unit,
-    onNavigateToHealthcare: () -> Unit = {},
+    onNavigateToHome: () -> Unit = {},
+    onNavigateToGuide: () -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
     onNavigateToAssessment: () -> Unit = {},
     onNavigateToVaccination: () -> Unit = {},
-    onNavigateToDestinations: () -> Unit = {},
-    onNavigateToServices: () -> Unit = {},
     viewModel: TravelViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    
+
     PreTravelContent(
         uiState = uiState,
         onBack = onBack,
-        onNavigateToHealthcare = onNavigateToHealthcare,
+        onNavigateToHome = onNavigateToHome,
+        onNavigateToGuide = onNavigateToGuide,
+        onNavigateToProfile = onNavigateToProfile,
         onNavigateToAssessment = onNavigateToAssessment,
         onNavigateToVaccination = onNavigateToVaccination,
-        onNavigateToDestinations = onNavigateToDestinations,
-        onNavigateToServices = onNavigateToServices,
         onDatesSelected = { start, end ->
             viewModel.saveAndSyncDates(start, end)
         }
@@ -61,322 +65,296 @@ fun PreTravelScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PreTravelContent(
-    uiState: com.visitbali.balitravelhealth.viewmodel.TravelUiState,
+    uiState: TravelUiState,
     onBack: () -> Unit,
-    onNavigateToHealthcare: () -> Unit = {},
-    onNavigateToAssessment: () -> Unit = {},
-    onNavigateToVaccination: () -> Unit = {},
-    onNavigateToDestinations: () -> Unit = {},
-    onNavigateToServices: () -> Unit = {},
+    onNavigateToHome: () -> Unit = {},
+    onNavigateToGuide: () -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
+    onNavigateToAssessment: () -> Unit,
+    onNavigateToVaccination: () -> Unit,
     onDatesSelected: (LocalDate, LocalDate) -> Unit
 ) {
-    var showRangePicker by remember { mutableStateOf(value = false) }
-    val dateFormatter = DateTimeFormatter.ofPattern("dd MMMM")
+    var showRangePicker by remember { mutableStateOf(false) }
+    val dateFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.Black
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+        containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = {
+            BaliNavigationBar(
+                initialSelectedItem = 0,
+                onHomeClick = onNavigateToHome,
+                onGuideClick = onNavigateToGuide,
+                onProfileClick = onNavigateToProfile
             )
-        },
-        containerColor = Color.White
+        }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp)
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Surface(
+                onClick = onBack,
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+                modifier = Modifier.size(44.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.cd_back),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
             Text(
-                text = "Get Prepared",
+                text = stringResource(R.string.pre_travel_title),
                 style = MaterialTheme.typography.headlineLarge.copy(
-                    fontFamily = FontFamily(Font(R.font.inter_font)),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 32.sp
+                    fontSize = 36.sp,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             )
             Text(
-                text = "Prevention is better than cure",
+                text = stringResource(R.string.pre_travel_subtitle),
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontFamily = FontFamily(Font(R.font.instrument_serif_italic)),
-                    color = Color.Gray,
+                    fontStyle = FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     fontSize = 18.sp
                 )
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
-            AdviceCardStack()
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Text(
-                text = "Tools",
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                )
+            SectionHeader(title = stringResource(R.string.label_advice))
+            Spacer(modifier = Modifier.height(12.dp))
+            val latestAssessment = uiState.latestAssessment
+            val adviceTitle = latestAssessment?.diagnosis ?: stringResource(R.string.pre_travel_advice_default_title)
+            val adviceContent = latestAssessment?.recommendation ?: stringResource(R.string.pre_travel_advice_default_desc)
+            AdviceCard(
+                title = adviceTitle,
+                description = adviceContent
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
+            SectionHeader(title = stringResource(R.string.label_tools))
+            Spacer(modifier = Modifier.height(16.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 ToolCard(
-                    title = "Health Risk\nAssessment",
-                    color = Color(0xFF1565C0),
-                    iconRes = R.drawable.ic_assessment,
-                    modifier = Modifier.weight(1f).clickable { onNavigateToAssessment() }
-                )
-                ToolCard(
-                    title = "Vaccine\nRecord",
-                    color = Color(0xFFD49110),
-                    iconRes = R.drawable.ic_vaccine,
-                    modifier = Modifier.weight(1f).clickable { onNavigateToVaccination() }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                ToolCard(
-                    title = "Destination\nHealth Risks",
-                    color = Color(0xFF2E7D32),
-                    iconRes = R.drawable.ic_placepin,
-                    modifier = Modifier.weight(1f).clickable { onNavigateToDestinations() }
-                )
-                ToolCard(
-                    title = "Travel\nServices",
+                    title = stringResource(R.string.pre_travel_tool_health_risk),
+                    icon = Icons.Default.Checklist,
                     color = MaterialTheme.colorScheme.primary,
-                    iconRes = R.drawable.ic_hospital,
-                    modifier = Modifier.weight(1f).clickable { onNavigateToServices() }
+                    modifier = Modifier.weight(1f),
+                    onClick = onNavigateToAssessment
+                )
+                ToolCard(
+                    title = stringResource(R.string.pre_travel_tool_vaccine_record),
+                    icon = Icons.Default.Vaccines,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f),
+                    onClick = onNavigateToVaccination
                 )
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text(
-                text = "Schedule",
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontFamily = FontFamily(Font(R.font.inter_font)),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                )
-            )
-
+            SectionHeader(title = stringResource(R.string.label_schedule))
             Spacer(modifier = Modifier.height(16.dp))
 
             val arrivalDate = uiState.arrivalDate
             val departureDate = uiState.departureDate
-            val scheduleText = if (arrivalDate != null && departureDate != null) {
+            val scheduleTitle = if (arrivalDate != null && departureDate != null) {
                 "${arrivalDate.format(dateFormatter)} - ${departureDate.format(dateFormatter)}"
             } else {
-                "Enter Your Trip Date"
+                stringResource(R.string.pre_travel_add_dates)
+            }
+            val scheduleSub = if (arrivalDate != null && departureDate != null) {
+                stringResource(R.string.pre_travel_change_schedule)
+            } else {
+                stringResource(R.string.pre_travel_set_schedule)
             }
 
             ScheduleCard(
-                text = scheduleText,
-            ) { showRangePicker = true }
+                title = scheduleTitle,
+                subtitle = scheduleSub,
+                onClick = { showRangePicker = true }
+            )
+
+            Spacer(modifier = Modifier.height(40.dp))
         }
     }
 
     if (showRangePicker) {
         DateRangePickerModal(
-            onDismiss = { showRangePicker = false }
-        ) { start, end ->
-            onDatesSelected(start, end)
-            showRangePicker = false
-        }
-    }
-}
-
-@Composable
-fun AdviceCardStack() {
-    var cardIndex by remember { mutableIntStateOf(0) }
-    val totalCards = 3
-    // Correct sequence: Grey (0), Red (1), Orange (2)
-    val colors = listOf(Color(0xFFE0E0E0), Color(0xFFB71C1C), Color(0xFFD49110))
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(280.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        // We render based on their Z-order
-        for (i in 0 until totalCards) {
-            // Determine which color/content this specific card "slot" has
-            // based on current rotation index
-            val actualCardIndex = (i + cardIndex) % totalCards
-            val isFront = i == 0
-            
-            // Animation for the flip/send-to-back effect
-            val transition = updateTransition(targetState = isFront, label = "CardTransition_$actualCardIndex")
-            
-            val rotation by transition.animateFloat(
-                transitionSpec = { tween(durationMillis = 600, easing = FastOutSlowInEasing) },
-                label = "Rotation"
-            ) { front -> if (front) 0f else -5f }
-
-            val offset by transition.animateIntOffset(
-                transitionSpec = { tween(durationMillis = 600, easing = FastOutSlowInEasing) },
-                label = "Offset"
-            ) { front -> 
-                if (front) IntOffset(0, 0) 
-                else IntOffset((i * 15), (i * 15)) 
+            onDismiss = { showRangePicker = false },
+            onDateRangeSelected = { start, end ->
+                onDatesSelected(start, end)
+                showRangePicker = false
             }
-
-            // The actual card
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth(0.95f)
-                    .fillMaxHeight()
-                    .offset { offset }
-                    .graphicsLayer {
-                        rotationZ = rotation
-                        cameraDistance = 12f * density
-                    }
-                    .zIndex((totalCards - i).toFloat()) // Higher Z for front cards
-                    .clickable(enabled = isFront) {
-                        cardIndex = (cardIndex + 1) % totalCards
-                    },
-                shape = RoundedCornerShape(24.dp),
-                color = colors[actualCardIndex],
-                shadowElevation = 4.dp
-            ) {
-                if (isFront) {
-                    AdviceContent()
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun AdviceContent() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Surface(
-            modifier = Modifier
-                .padding(16.dp)
-                .clip(RoundedCornerShape(16.dp)),
-            color = Color.White
-        ) {
-            Text(
-                text = "Advice",
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily(Font(R.font.inter_font))
-            )
-        }
-
-        Column(
-            modifier = Modifier.align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_pre_background),
-                contentDescription = null,
-                modifier = Modifier.size(64.dp),
-                tint = Color.Gray.copy(alpha = 0.6f)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "There's no advice for now.",
-                fontFamily = FontFamily(Font(R.font.inter_font)),
-                color = Color.DarkGray
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreTravelScreenPreview() {
-    BaliTravelHealthTheme {
-        PreTravelContent(
-            uiState = com.visitbali.balitravelhealth.viewmodel.TravelUiState(
-                arrivalDate = LocalDate.now(),
-                departureDate = LocalDate.now().plusDays(7)
-            ),
-            onBack = {},
-            onNavigateToHealthcare = {},
-            onNavigateToAssessment = {},
-            onNavigateToVaccination = {},
-            onNavigateToDestinations = {},
-            onNavigateToServices = {},
-            onDatesSelected = { _, _ -> }
         )
     }
 }
 
 @Composable
-fun ScheduleCard(text: String, onClick: () -> Unit) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-            .clip(RoundedCornerShape(24.dp)),
-        color = Color(0xFF689F38)
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            // Background Icon with 20% opacity
-            Icon(
-                painter = painterResource(id = R.drawable.ic_during_light),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(120.dp)
-                    .align(Alignment.BottomStart)
-                    .offset(x = (-48).dp, y = 30.dp)
-                    .graphicsLayer { alpha = 0.2f },
-                tint = Color.White
-            )
+private fun SectionHeader(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleLarge.copy(
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 22.sp
+        )
+    )
+}
 
+@Composable
+private fun AdviceCard(title: String, description: String) {
+    Card(
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFF8C82))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = Color.White.copy(alpha = 0.2f),
+                modifier = Modifier.size(40.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = description,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    color = Color.White.copy(alpha = 0.9f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ToolCard(
+    title: String,
+    icon: ImageVector,
+    color: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Card(
+        onClick = onClick,
+        modifier = modifier.aspectRatio(1f),
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = color)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(44.dp)
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 18.sp,
+                    lineHeight = 22.sp
+                )
+            )
+        }
+    }
+}
+
+@Composable
+private fun ScheduleCard(
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit
+) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(Color(0xFF5BA25B), Color(0xFF3E7A3E))
+                    )
+                )
+                .padding(24.dp)
+        ) {
             Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        color = Color.White,
-                        fontFamily = FontFamily(Font(R.font.inter_font)),
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = title,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
+                        fontSize = 18.sp,
+                        color = Color.White
                     )
-                )
-
+                    Text(
+                        text = subtitle,
+                        fontSize = 13.sp,
+                        color = Color.White.copy(alpha = 0.8f)
+                    )
+                }
                 Surface(
-                    onClick = onClick,
-                    shape = RoundedCornerShape(20.dp),
-                    color = Color.White
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color.White.copy(alpha = 0.2f),
+                    modifier = Modifier.size(56.dp)
                 ) {
-                    Box(
-                        modifier = Modifier.size(64.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Box(contentAlignment = Alignment.Center) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_calendar),
-                            contentDescription = "Set Schedule",
-                            modifier = Modifier.size(32.dp),
-                            tint = Color.Black
+                            imageVector = Icons.Default.CalendarMonth,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }
@@ -400,61 +378,41 @@ private fun DateRangePickerModal(
                 onClick = {
                     val startMillis = state.selectedStartDateMillis
                     val endMillis = state.selectedEndDateMillis
-                    if ((startMillis != null) && (endMillis != null)) {
+                    if (startMillis != null && endMillis != null) {
                         val start = Instant.ofEpochMilli(startMillis).atZone(ZoneId.of("UTC")).toLocalDate()
                         val end = Instant.ofEpochMilli(endMillis).atZone(ZoneId.of("UTC")).toLocalDate()
                         onDateRangeSelected(start, end)
                     }
-                },
-                enabled = state.selectedStartDateMillis != null && state.selectedEndDateMillis != null
+                }
             ) {
-                Text("OK")
+                Text(stringResource(R.string.pre_travel_btn_confirm))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.btn_cancel))
             }
         }
     ) {
         DateRangePicker(
             state = state,
-            title = { Text("Select Travel Dates", modifier = Modifier.padding(16.dp)) },
+            title = { Text(stringResource(R.string.picker_title_select_travel_dates), modifier = Modifier.padding(16.dp)) },
             showModeToggle = false,
             modifier = Modifier.weight(1f)
         )
     }
 }
 
+@Preview
 @Composable
-fun ToolCard(title: String, color: Color, iconRes: Int, modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier
-            .aspectRatio(1f)
-            .clip(RoundedCornerShape(24.dp)),
-        color = color
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Icon(
-                painter = painterResource(id = iconRes),
-                contentDescription = null,
-                modifier = Modifier.size(48.dp),
-                tint = Color.White
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    color = Color.White,
-                    fontFamily = FontFamily(Font(R.font.inter_font)),
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = 22.sp
-                )
-            )
-        }
+private fun PreTravelScreenPreview() {
+    BaliTravelHealthTheme {
+        PreTravelContent(
+            uiState = TravelUiState(),
+            onBack = {},
+            onNavigateToAssessment = {},
+            onNavigateToVaccination = {},
+            onDatesSelected = { _, _ -> }
+        )
     }
 }

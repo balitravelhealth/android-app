@@ -6,6 +6,8 @@ import android.net.NetworkCapabilities
 import android.util.Log
 import com.visitbali.balitravelhealth.BuildConfig
 import com.visitbali.balitravelhealth.data.dao.GuideItemDao
+import com.visitbali.balitravelhealth.data.dao.HealthcareFacilityDao
+import com.visitbali.balitravelhealth.data.dao.LifeSupportItemDao
 import com.visitbali.balitravelhealth.data.dao.NurseDao
 import com.visitbali.balitravelhealth.data.remote.BaliHealthApiService
 import kotlinx.coroutines.async
@@ -16,6 +18,8 @@ class AppContentSyncRepository(
     private val api: BaliHealthApiService,
     private val guideItemDao: GuideItemDao,
     private val nurseDao: NurseDao,
+    private val lifeSupportItemDao: LifeSupportItemDao,
+    private val healthcareFacilityDao: HealthcareFacilityDao,
 ) {
     suspend fun refreshIfConnected(): Result<Unit> =
         if (isConnected()) refresh() else Result.success(Unit)
@@ -32,7 +36,27 @@ class AppContentSyncRepository(
                 nurseDao.replaceAll(response.data)
             }
 
-            listOf(guides, nurses).forEach { task ->
+            val blsFlows = async {
+                val response = api.getEmergencyGuideFlows()
+                lifeSupportItemDao.replaceAll(response.data.map { it.toEntity() })
+            }
+
+            val facilities = async {
+                runCatching { api.getFacilities() }
+                    .onSuccess { response ->
+                        if (response.data.isNotEmpty()) {
+                            healthcareFacilityDao.replaceAll(response.data)
+                        }
+                    }
+                    .onFailure {
+                        if (BuildConfig.DEBUG) Log.w("ContentSync", "Failed to fetch facilities, ensuring seeder data exists", it)
+                        if (healthcareFacilityDao.count() == 0) {
+                            healthcareFacilityDao.insertAll(com.visitbali.balitravelhealth.data.database.DatabaseSeeder.getAllFacilities())
+                        }
+                    }
+            }
+
+            listOf(guides, nurses, blsFlows, facilities).forEach { task ->
                 runCatching { task.await() }
                     .onFailure {
                         if (BuildConfig.DEBUG) Log.w("ContentSync", "Sync task failed", it)

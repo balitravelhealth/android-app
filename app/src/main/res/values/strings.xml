@@ -85,11 +85,21 @@
     <string name="pre_travel_tool_vaccine_record">Vaccine\nRecord</string>
     <string name="pre_travel_no_advice">There\'s no advice for now.</string>
     <string name="pre_travel_enter_trip_date">Enter Your Trip Date</string>
+    <string name="pre_travel_advice_default_title">Health Advice</string>
+    <string name="pre_travel_advice_default_desc">Stay prepared for your Bali trip. Complete your health risk assessment to get personalized recommendations.</string>
+    <string name="pre_travel_add_dates">Add travel dates</string>
+    <string name="pre_travel_change_schedule">Tap to change your travel schedule</string>
+    <string name="pre_travel_set_schedule">Tap to set arrival &amp; departure</string>
+    <string name="pre_travel_btn_confirm">Confirm</string>
     <string name="cd_set_schedule">Set Schedule</string>
 
     <!-- ===== POST-TRAVEL SCREEN ===== -->
     <string name="post_travel_title">Recovery &amp; Health</string>
     <string name="post_travel_subtitle">Track your health after the journey</string>
+    <string name="post_travel_header_arriving_home">Arriving Home</string>
+    <string name="post_travel_header_subtitle">Home sweet home. Last action.\nStay robust.</string>
+    <string name="post_travel_advice_default_title">Post-Travel Screening</string>
+    <string name="post_travel_advice_default_desc">Ensure you\'re healthy after your Bali trip. Complete your health screening to detect any risks early.</string>
     <string name="post_travel_tool_health_screening">Health \nScreening</string>
     <string name="post_travel_card_question">How was your health after Bali?</string>
 
@@ -107,7 +117,16 @@
 
     <!-- ===== NURSING CARE SCREEN ===== -->
     <string name="nursing_care_title">Nursing Care Service</string>
+    <string name="nursing_care_view_records">View care records</string>
     <string name="nursing_care_your_appointment">Your Appointment</string>
+    <string name="nursing_care_loading_nurses">Loading nurses…</string>
+    <string name="nursing_care_error_loading">Couldn\'t load nurses</string>
+    <string name="nursing_care_no_nurses">No nurses available</string>
+    <string name="nursing_care_pull_to_refresh">Pull down to refresh, or check back soon.</string>
+    <string name="nursing_care_record_label">Nursing Record</string>
+    <string name="nursing_care_visit_date">Visit Date</string>
+    <string name="nursing_care_assessment">Assessment</string>
+    <string name="nursing_care_diagnosis">Diagnosis</string>
     <string name="nursing_care_years_experience">%d years experience</string>
     <string name="nursing_care_rate_from">from %s</string>
     <string name="nursing_care_meeting_point">Meeting Point</string>
@@ -143,7 +162,29 @@
 
     <!-- ===== GUIDE SCREEN ===== -->
     <string name="guide_header_title">Emergency guide</string>
+    <string name="guide_header_subtitle">Basic life support and emergency guidance</string>
+    <string name="guide_section_bls_title">Basic Life Support</string>
+    <string name="guide_section_bls_subtitle">Endpoint content from emergency guide flows</string>
+    <string name="guide_section_decision_title">Emergency Decision Guides</string>
+    <string name="guide_section_decision_subtitle">Interactive, step-by-step flows</string>
+    <string name="guide_section_steps_title">Emergency Guide Steps</string>
+    <string name="guide_section_steps_subtitle">Sequential guides fetched from the backend</string>
+    <string name="guide_loading_content">Fetching guide content</string>
+    <string name="guide_empty_state">Guide content is not available</string>
+    <string name="guide_detail_default_title">Emergency Guide</string>
+    <string name="guide_step_count">%d steps</string>
     <string name="guide_placeholder_title">{guide_title}</string>
     <string name="guide_placeholder_description">{guide_description}</string>
 
+    <!-- ===== EMERGENCY GUIDE FLOW SCREEN ===== -->
+    <string name="emergency_flows_title">Emergency Guide Flows</string>
+    <string name="emergency_flows_no_guides">No emergency guides available</string>
+    <string name="emergency_flows_subtitle">Interactive step-by-step emergency guides</string>
+    <string name="emergency_flow_step_format">STEP %d</string>
+    <string name="emergency_flow_completed">Guide Completed</string>
+    <string name="emergency_flow_btn_return">Return to Emergency Guides</string>
+    <string name="emergency_flow_choice_prompt">What is the situation?</string>
+
+    <string name="nurse_detail_tap_to_select_date">Tap to select date</string>
+    <string name="error_unknown">Unknown error occurred</string>
 </resources>

@@ -25,6 +25,8 @@ import com.visitbali.balitravelhealth.ui.theme.BaliTravelHealthTheme
 import com.visitbali.balitravelhealth.viewmodel.LoginUiState
 import com.visitbali.balitravelhealth.viewmodel.LoginViewModel
 
+import androidx.compose.ui.res.stringResource
+
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = viewModel(),
@@ -69,7 +71,7 @@ fun LoginScreen(
             // Center Bird Image
             Image(
                 painter = painterResource(id = R.drawable.jalak),
-                contentDescription = "Jalak Bali",
+                contentDescription = stringResource(R.string.cd_jalak_bali),
                 modifier = Modifier
                     .fillMaxWidth(1f)
                     .align(Alignment.Center),
@@ -79,7 +81,7 @@ fun LoginScreen(
             // Top Left Logo
             Image(
                 painter = painterResource(id = R.drawable.gapura),
-                contentDescription = "Logo",
+                contentDescription = stringResource(R.string.cd_logo),
                 modifier = Modifier
                     .padding(top = 48.dp, start = 24.dp)
                     .size(80.dp)
@@ -112,12 +114,12 @@ fun LoginScreen(
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.google_icon),
-                            contentDescription = "Google Icon",
+                            contentDescription = stringResource(R.string.cd_google_icon),
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = "Continue With Google",
+                            text = stringResource(R.string.btn_continue_with_google),
                             color = Color.White,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium

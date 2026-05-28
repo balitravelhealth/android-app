@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -23,6 +24,7 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
+import com.visitbali.balitravelhealth.R
 import com.visitbali.balitravelhealth.viewmodel.TravelUiState
 import com.visitbali.balitravelhealth.viewmodel.TravelViewModel
 import java.time.Instant
@@ -71,13 +73,13 @@ fun SetupTravelScreenContent(
             .statusBarsPadding()
     ) {
         IconButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.Black)
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back), tint = Color.Black)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Ready to travel?",
+            text = stringResource(R.string.setup_travel_title),
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Serif,
@@ -87,7 +89,7 @@ fun SetupTravelScreenContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "The seasonal forecast helps you plan your activities according to Bali's tropical climate patterns.",
+            text = stringResource(R.string.setup_travel_subtitle),
             fontSize = 12.sp,
             color = Color.Gray,
             lineHeight = 20.sp
@@ -100,7 +102,7 @@ fun SetupTravelScreenContent(
             modifier = Modifier.fillMaxWidth()
         ) {
             DateInput(
-                label = uiState.arrivalDate?.format(dateFormatter) ?: "Arrival Date",
+                label = uiState.arrivalDate?.format(dateFormatter) ?: stringResource(R.string.setup_travel_placeholder_arrival),
                 modifier = Modifier.weight(1f),
                 onClick = { showRangePicker = true }
             )
@@ -110,7 +112,7 @@ fun SetupTravelScreenContent(
             Spacer(modifier = Modifier.width(16.dp))
 
             DateInput(
-                label = uiState.departureDate?.format(dateFormatter) ?: "Departure Date",
+                label = uiState.departureDate?.format(dateFormatter) ?: stringResource(R.string.setup_travel_placeholder_departure),
                 modifier = Modifier.weight(1f),
                 onClick = { showRangePicker = true }
             )
@@ -135,7 +137,7 @@ fun SetupTravelScreenContent(
                 )
             } else {
                 Text(
-                    text = "Select dates to see seasonal outlook",
+                    text = stringResource(R.string.setup_travel_hint_select_dates),
                     color = Color.Gray
                 )
             }
@@ -144,7 +146,7 @@ fun SetupTravelScreenContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Great!\nIt'll be ${uiState.seasonalForecast?.seasonName ?: "{season}"} during these days!",
+            text = stringResource(R.string.setup_travel_season_headline, uiState.seasonalForecast?.seasonName ?: "{season}"),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -160,7 +162,7 @@ fun SetupTravelScreenContent(
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text(
-                text = "Skip for now",
+                text = stringResource(R.string.setup_travel_btn_skip),
                 fontSize = 16.sp,
                 color = Color.DarkGray,
                 textDecoration = TextDecoration.Underline,
@@ -193,7 +195,7 @@ fun SetupTravelScreenContent(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Next", fontSize = 16.sp)
+                Text(stringResource(R.string.btn_next), fontSize = 16.sp)
             }
         }
 
@@ -268,18 +270,18 @@ private fun DateRangePickerModal(
                 },
                 enabled = state.selectedStartDateMillis != null && state.selectedEndDateMillis != null
             ) {
-                Text("OK")
+                Text(stringResource(R.string.btn_ok))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.btn_cancel))
             }
         }
     ) {
         DateRangePicker(
             state = state,
-            title = { Text("Select Travel Dates", modifier = Modifier.padding(16.dp)) },
+            title = { Text(stringResource(R.string.picker_title_select_travel_dates), modifier = Modifier.padding(16.dp)) },
             showModeToggle = false,
             modifier = Modifier.weight(1f)
         )

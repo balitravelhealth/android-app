@@ -3,7 +3,10 @@ package com.visitbali.balitravelhealth.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.visitbali.balitravelhealth.data.api.RetrofitClient
+import com.visitbali.balitravelhealth.data.dto.AssessmentResult
 import com.visitbali.balitravelhealth.data.remote.SeasonalForecast
+import com.visitbali.balitravelhealth.data.repository.AssessmentRepository
 import com.visitbali.balitravelhealth.data.repository.TravelRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +20,7 @@ data class TravelUiState(
     val arrivalDate: LocalDate? = null,
     val departureDate: LocalDate? = null,
     val seasonalForecast: SeasonalForecast? = null,
+    val latestAssessment: AssessmentResult? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
 )
@@ -24,11 +28,16 @@ data class TravelUiState(
 class TravelViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = TravelRepository(application)
+    private val assessmentRepository = AssessmentRepository(RetrofitClient.apiService)
 
     private val _uiState = MutableStateFlow(TravelUiState())
     val uiState: StateFlow<TravelUiState> = _uiState.asStateFlow()
 
     init {
+        loadData()
+    }
+
+    private fun loadData() {
         viewModelScope.launch {
             repository.arrivalDate.collect { arrival ->
                 arrival?.let {
@@ -48,6 +57,16 @@ class TravelViewModel(application: Application) : AndroidViewModel(application) 
                     }
                 }
             }
+        }
+        fetchLatestAssessment()
+    }
+
+    private fun fetchLatestAssessment() {
+        viewModelScope.launch {
+            assessmentRepository.getHistory(page = 1, limit = 1)
+                .onSuccess { response ->
+                    _uiState.update { it.copy(latestAssessment = response.data.firstOrNull()) }
+                }
         }
     }
 

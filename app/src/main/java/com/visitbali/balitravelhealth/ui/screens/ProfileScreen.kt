@@ -67,7 +67,7 @@ fun ProfileScreen(
     }
 
     Scaffold(
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             BaliNavigationBar(
@@ -165,7 +165,7 @@ fun ProfileContent(
                     .size(90.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primaryContainer)
-                    .border(3.dp, Color.White, CircleShape)
+                    .border(3.dp, MaterialTheme.colorScheme.surface, CircleShape)
                     .clickable { onPhotoClick() },
                 contentAlignment = Alignment.Center
             ) {
@@ -187,12 +187,20 @@ fun ProfileContent(
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(uiState.name.ifBlank { "Traveler" }, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    text = uiState.name.ifBlank { "Traveler" },
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
                 val details = listOfNotNull(
                     ageText(uiState.dob).takeIf { it.isNotBlank() },
                     uiState.country.takeIf { it.isNotBlank() },
                 ).joinToString(" • ")
-                Text(details.ifBlank { "Complete your profile" }, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    text = details.ifBlank { "Complete your profile" },
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
             AssistChip(
                 onClick = onEditToggle,
@@ -223,7 +231,12 @@ fun ProfileContent(
             Spacer(modifier = Modifier.height(20.dp))
         }
 
-        Text("Account", fontWeight = FontWeight.Bold, fontSize = 22.sp)
+        Text(
+            text = "Account",
+            fontWeight = FontWeight.Bold,
+            fontSize = 22.sp,
+            color = MaterialTheme.colorScheme.onSurface
+        )
         Spacer(modifier = Modifier.height(12.dp))
         Card(shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Row(modifier = Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -343,7 +356,12 @@ fun ProfileField(
 ) {
     val focusManager = LocalFocusManager.current
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)) {
-        Text(text = label, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+        Text(
+            text = label,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
         if (isEditable) {
             TextField(
                 value = value,
@@ -352,16 +370,29 @@ fun ProfileField(
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Black,
-                    focusedIndicatorColor = Color.Black
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface
                 ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 singleLine = true
             )
         } else {
-            Text(text = value.ifEmpty { "{unspecified}" }, fontSize = 16.sp, color = Color.Gray, modifier = Modifier.padding(top = 4.dp))
-            HorizontalDivider(modifier = Modifier.padding(top = 8.dp), color = Color.Black, thickness = 1.dp)
+            Text(
+                text = value.ifEmpty { "{unspecified}" },
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            HorizontalDivider(
+                modifier = Modifier.padding(top = 8.dp),
+                color = MaterialTheme.colorScheme.outlineVariant,
+                thickness = 1.dp
+            )
         }
     }
 }

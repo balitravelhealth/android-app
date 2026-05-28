@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
         GuideItem::class,
         LifeSupportItem::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)

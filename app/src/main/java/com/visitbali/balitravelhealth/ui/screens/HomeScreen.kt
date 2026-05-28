@@ -1,6 +1,7 @@
 package com.visitbali.balitravelhealth.ui.screens
 
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.airbnb.lottie.compose.*
 import com.visitbali.balitravelhealth.R
 import androidx.compose.animation.core.tween
@@ -222,11 +223,11 @@ fun HeaderContent(
                 start.linkTo(avatar.end, margin = 9.dp)
             }
         ) {
-            Text(text = "Welcome back,", style = MaterialTheme.typography.labelMedium, color = Color.White)
+            Text(text = stringResource(R.string.home_welcome_back), style = MaterialTheme.typography.labelMedium, color = Color.White)
             Text(text = userName, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = Color.White)
         }
 
-        val headlineText = if (isInBali) "Welcome to Bali!\nStay Healthy" else "Keep Healthy\nWhile in Bali"
+        val headlineText = if (isInBali) stringResource(R.string.home_headline_in_bali) else stringResource(R.string.home_headline_not_in_bali)
 
         Text(
             text = headlineText,
@@ -272,29 +273,29 @@ fun CardsGridContent(
 ) {
     val cards = listOf(
         HomeCardData(
-            "Pre Travel",
-            "Prepare your health\nbefore traveling",
+            stringResource(R.string.home_card_pre_travel_title),
+            stringResource(R.string.home_card_pre_travel_desc),
             PreTravelMint,
             R.drawable.ic_pre_light,
             R.drawable.ic_pre_background
         ),
         HomeCardData(
-            "During Travel",
-            "Track your health\nwhile traveling",
+            stringResource(R.string.home_card_during_travel_title),
+            stringResource(R.string.home_card_during_travel_desc),
             DuringTravelYellow,
             R.drawable.ic_during_light,
             R.drawable.ic_during_background
         ),
         HomeCardData(
-            "Post Travel",
-            "Health check-up\nafter traveling",
+            stringResource(R.string.home_card_post_travel_title),
+            stringResource(R.string.home_card_post_travel_desc),
             PostTravelSage,
             R.drawable.ic_post_light,
             R.drawable.ic_post_background
         ),
         HomeCardData(
-            "Nursing Care",
-            "Get Nursing Care Service\nwhile traveling",
+            stringResource(R.string.home_card_nursing_care_title),
+            stringResource(R.string.home_card_nursing_care_desc),
             NursingMutedRed,
             R.drawable.ic_nurse_light,
             R.drawable.ic_nurse_background
@@ -434,7 +435,7 @@ fun BaliNavigationBar(
                     outlineRes = R.drawable.ic_home_outline
                 )
             },
-            label = { Text("Home", style = MaterialTheme.typography.labelMedium) },
+            label = { Text(stringResource(R.string.nav_home), style = MaterialTheme.typography.labelMedium) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 selectedTextColor = MaterialTheme.colorScheme.primary,
@@ -455,7 +456,7 @@ fun BaliNavigationBar(
                     outlineRes = R.drawable.ic_guide_outline
                 )
             }, 
-            label = { Text("Guide", style = MaterialTheme.typography.labelMedium) },
+            label = { Text(stringResource(R.string.nav_guide), style = MaterialTheme.typography.labelMedium) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 selectedTextColor = MaterialTheme.colorScheme.primary,
@@ -471,11 +472,11 @@ fun BaliNavigationBar(
             icon = {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = "Profile",
+                    contentDescription = stringResource(R.string.cd_profile),
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Profile", style = MaterialTheme.typography.labelMedium) },
+            label = { Text(stringResource(R.string.nav_profile), style = MaterialTheme.typography.labelMedium) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 selectedTextColor = MaterialTheme.colorScheme.primary,
@@ -485,16 +486,25 @@ fun BaliNavigationBar(
     }
 }
 
+@Composable
 private fun countdownText(uiState: HomeUiState, isInBali: Boolean): String {
     val days = uiState.daysUntilArrival
+    val daysUntilDeparture = uiState.daysUntilDeparture
+
     return when {
-        days == null -> "Add your travel dates\nto see your countdown"
-        days > 1 -> "You're going to Bali\nin $days days"
-        days == 1L -> "You're going to Bali\ntomorrow"
-        days == 0L -> "You're arriving in Bali\ntoday"
-        days == -1L -> "You arrived in Bali\nyesterday"
-        isInBali || days < -1 -> "Enjoy your stay in Bali"
-        else -> "Add your travel dates\nto see your countdown"
+        isInBali -> {
+            if (daysUntilDeparture != null && daysUntilDeparture >= 0) {
+                stringResource(R.string.home_subtext_leaving, "$daysUntilDeparture days")
+            } else {
+                stringResource(R.string.home_subtext_enjoy)
+            }
+        }
+        days == null -> stringResource(R.string.setup_travel_hint_select_dates)
+        days > 1 -> stringResource(R.string.home_subtext_going, "$days days")
+        days == 1L -> stringResource(R.string.home_subtext_going, "tomorrow")
+        days == 0L -> stringResource(R.string.home_subtext_going, "today")
+        days == -1L -> stringResource(R.string.home_subtext_going, "yesterday")
+        else -> stringResource(R.string.home_subtext_enjoy)
     }
 }
 

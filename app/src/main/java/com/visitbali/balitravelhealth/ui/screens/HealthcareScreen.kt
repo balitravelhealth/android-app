@@ -36,6 +36,9 @@ import com.visitbali.balitravelhealth.viewmodel.FacilityUiState
 import com.visitbali.balitravelhealth.viewmodel.FacilityWithDistance
 import com.visitbali.balitravelhealth.viewmodel.HealthcareFacilityViewModel
 
+import androidx.compose.ui.res.stringResource
+import com.visitbali.balitravelhealth.R
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HealthcareScreen(
@@ -67,17 +70,17 @@ fun HealthcareContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Healthcare Facilities", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.healthcare_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
                 actions = {
                     IconButton(onClick = { isMapView = !isMapView }) {
                         Icon(
                             imageVector = if (isMapView) Icons.Default.Search else Icons.Default.Map,
-                            contentDescription = if (isMapView) "List View" else "Map View"
+                            contentDescription = if (isMapView) stringResource(R.string.cd_list_view) else stringResource(R.string.cd_map_view)
                         )
                     }
                 },
@@ -125,12 +128,12 @@ fun SearchBar(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        placeholder = { Text("Search by name, specialty, or area...") },
+        placeholder = { Text(stringResource(R.string.healthcare_search_hint)) },
         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
         trailingIcon = {
             if (query.isNotEmpty()) {
                 IconButton(onClick = onClear) {
-                    Icon(Icons.Default.Clear, contentDescription = "Clear")
+                    Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.cd_clear_search))
                 }
             }
         },
@@ -157,7 +160,7 @@ fun FilterChips(
         FilterChip(
             selected = activeFilter == null,
             onClick = { onFilterSelected(null) },
-            label = { Text("All") }
+            label = { Text(stringResource(R.string.healthcare_filter_all)) }
         )
         FacilityType.values().forEach { type ->
             FilterChip(
@@ -175,7 +178,7 @@ fun FilterChips(
 fun HealthcareListView(facilities: List<FacilityWithDistance>) {
     if (facilities.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No facilities found", color = Color.Gray)
+            Text(stringResource(R.string.healthcare_no_facilities), color = Color.Gray)
         }
     } else {
         LazyColumn(
@@ -252,7 +255,7 @@ fun FacilityCard(item: FacilityWithDistance) {
 
             if (item.distanceKm != null) {
                 Text(
-                    text = String.format("%.1f km away", item.distanceKm),
+                    text = stringResource(R.string.healthcare_distance_format, item.distanceKm),
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.DarkGray,
                     fontWeight = FontWeight.Bold
@@ -285,7 +288,7 @@ fun FacilityCard(item: FacilityWithDistance) {
                 ) {
                     Icon(Icons.Default.Call, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Call", fontSize = 14.sp)
+                    Text(stringResource(R.string.healthcare_btn_call), fontSize = 14.sp)
                 }
 
                 OutlinedButton(
@@ -301,7 +304,7 @@ fun FacilityCard(item: FacilityWithDistance) {
                 ) {
                     Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Map", fontSize = 14.sp)
+                    Text(stringResource(R.string.healthcare_btn_map), fontSize = 14.sp)
                 }
             }
         }

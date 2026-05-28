@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 
 class SplashViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -34,9 +35,14 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
             api = RetrofitClient.apiService,
             guideItemDao = db.guideItemDao(),
             nurseDao = db.nurseDao(),
+            lifeSupportItemDao = db.lifeSupportItemDao(),
+            healthcareFacilityDao = db.healthcareFacilityDao(),
         )
 
         viewModelScope.launch {
+            // Trigger sync immediately for public data
+            val syncJob = launch { contentSyncRepository.refreshIfConnected() }
+
             val accessToken = preferences.accessToken.first()
             val localProfile = preferences.userProfile.first()
             val isLoggedIn = localProfile.isLoggedIn
@@ -55,7 +61,6 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
                         )
                     )
                     preferences.saveProfileComplete(true)
-                    contentSyncRepository.refreshIfConnected()
                     _startDestination.value = "home"
                 } catch (e: CancellationException) {
                     throw e
@@ -68,7 +73,6 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
                         _startDestination.value = if (localProfile.isProfileComplete) "home" else "setup"
                     } else {
                         if (BuildConfig.DEBUG) Log.w("SplashVM", "Server error (${e.code()}), falling back to local state")
-                        contentSyncRepository.refreshIfConnected()
                         _startDestination.value = if (localProfile.isProfileComplete) "home" else "setup"
                     }
                 } catch (e: Exception) {
@@ -79,7 +83,15 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
                 _startDestination.value = "login"
             }
 
-            delay(1500)
+            // Ensure sync completes before hiding splash if it's the first install or data is missing
+            // But don't block too long for better UX
+            try {
+                withTimeout(3000) { syncJob.join() }
+            } catch (e: Exception) {
+                if (BuildConfig.DEBUG) Log.w("SplashVM", "Sync timed out or failed")
+            }
+
+            delay(1000)
             _isLoading.value = false
         }
     }

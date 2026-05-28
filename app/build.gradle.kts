@@ -29,12 +29,6 @@ android {
             "\"${localProps.getProperty("API_SECRET_KEY", "")}\""
         )
 
-        buildConfigField(
-            "String",
-            "GOOGLE_WEB_CLIENT_ID",
-            "\"${localProps.getProperty("GOOGLE_WEB_CLIENT_ID", "")}\""
-        )
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true

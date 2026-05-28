@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 
 class GuideRepository(
     private val dao: GuideItemDao,
+    private val lifeSupportDao: com.visitbali.balitravelhealth.data.dao.LifeSupportItemDao,
     private val api: BaliHealthApiService,
 ) {
     val guides: Flow<List<GuideItem>> = dao.getAll()
@@ -21,6 +22,12 @@ class GuideRepository(
         val flowsResult = runCatching { api.getEmergencyGuideFlows().data }
         val guidesResult = runCatching { api.getEmergencyGuides().data }
 
+        val flows = flowsResult
+            .onSuccess { remoteFlows -> lifeSupportDao.replaceAll(remoteFlows.map { it.toEntity() }) }
+            .getOrElse {
+                lifeSupportDao.getAllSnapshot().map { it.toSummary() }
+            }
+
         val guideItems = guidesResult
             .onSuccess { remoteGuides -> dao.replaceAll(remoteGuides.map { it.toEntity() }) }
             .getOrElse {
@@ -28,7 +35,7 @@ class GuideRepository(
             }
 
         val content = GuideMenuContent(
-            flows = flowsResult.getOrDefault(emptyList()),
+            flows = flows,
             categories = guideItems.toCategories(),
         )
 
@@ -39,6 +46,16 @@ class GuideRepository(
             Result.failure(error ?: IllegalStateException("No guide content is available."))
         }
     }
+
+    private fun com.visitbali.balitravelhealth.data.model.LifeSupportItem.toSummary(): com.visitbali.balitravelhealth.data.dto.EmergencyGuideFlowSummary =
+        com.visitbali.balitravelhealth.data.dto.EmergencyGuideFlowSummary(
+            id = id,
+            title = title,
+            kategori = kategori,
+            deskripsi = deskripsi,
+            createdAt = createdAt,
+            updatedAt = updatedAt
+        )
 
     private fun GuideItem.toDtoLike(): EmergencyGuideItemDto = EmergencyGuideItemDto(
         id = id,

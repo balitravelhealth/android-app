@@ -72,6 +72,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import com.visitbali.balitravelhealth.R
 import com.visitbali.balitravelhealth.data.dto.EmergencyGuideFlowSummary
@@ -172,8 +173,8 @@ private fun GuideScreenContent(
                 if (uiState.basicLifeSupportFlows.isNotEmpty()) {
                     item {
                         GuideSectionHeader(
-                            title = "Basic Life Support",
-                            subtitle = "Endpoint content from emergency guide flows",
+                            title = stringResource(R.string.guide_section_bls_title),
+                            subtitle = stringResource(R.string.guide_section_bls_subtitle),
                         )
                     }
                     items(uiState.basicLifeSupportFlows, key = { "bls-${it.id}" }) { flow ->
@@ -189,8 +190,8 @@ private fun GuideScreenContent(
                 if (uiState.emergencyFlows.isNotEmpty()) {
                     item {
                         GuideSectionHeader(
-                            title = "Emergency Decision Guides",
-                            subtitle = "Interactive, step-by-step flows",
+                            title = stringResource(R.string.guide_section_decision_title),
+                            subtitle = stringResource(R.string.guide_section_decision_subtitle),
                         )
                     }
                     items(uiState.emergencyFlows, key = { "flow-${it.id}" }) { flow ->
@@ -206,8 +207,8 @@ private fun GuideScreenContent(
                 if (uiState.content.categories.isNotEmpty()) {
                     item {
                         GuideSectionHeader(
-                            title = "Emergency Guide Steps",
-                            subtitle = "Sequential guides fetched from the backend",
+                            title = stringResource(R.string.guide_section_steps_title),
+                            subtitle = stringResource(R.string.guide_section_steps_subtitle),
                         )
                     }
                     items(uiState.content.categories, key = { "category-${it.id}" }) { category ->
@@ -274,13 +275,13 @@ private fun GuideHeader(modifier: Modifier = Modifier) {
             }
             Spacer(modifier = Modifier.height(18.dp))
             Text(
-                text = "Guide",
+                text = stringResource(R.string.nav_guide),
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
             )
             Text(
-                text = "Basic life support and emergency guidance",
+                text = stringResource(R.string.guide_header_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -417,7 +418,7 @@ private fun GuideCategoryRow(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "${category.steps.size} steps",
+                        text = stringResource(R.string.guide_step_count, category.steps.size),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -478,7 +479,7 @@ private fun GuideLoadingBlock() {
         CircularProgressIndicator()
         Spacer(modifier = Modifier.height(14.dp))
         Text(
-            text = "Fetching guide content",
+            text = stringResource(R.string.guide_loading_content),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -532,15 +533,15 @@ private fun EmptyGuideState(
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
-            text = "Guide content is not available",
+            text = stringResource(R.string.guide_empty_state),
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Bold,
         )
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedButton(onClick = onRetry) {
             Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Try again")
+            Text(stringResource(R.string.nurse_detail_btn_try_again))
         }
     }
 }
@@ -558,10 +559,10 @@ fun GuideDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(category?.title ?: "Emergency Guide") },
+                title = { Text(category?.title ?: stringResource(R.string.guide_detail_default_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

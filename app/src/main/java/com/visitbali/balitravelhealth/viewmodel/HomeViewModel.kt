@@ -53,6 +53,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             api = RetrofitClient.apiService,
             guideItemDao = db.guideItemDao(),
             nurseDao = db.nurseDao(),
+            lifeSupportItemDao = db.lifeSupportItemDao(),
+            healthcareFacilityDao = db.healthcareFacilityDao(),
         )
         observeUserData()
         refreshData(syncContent = false)

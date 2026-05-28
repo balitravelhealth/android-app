@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.hbb20.countrypicker.dialog.launchCountryPickerDialog
 import com.hbb20.countrypicker.models.CPCountry
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.visitbali.balitravelhealth.R
 import com.visitbali.balitravelhealth.viewmodel.SetupViewModel
 import com.visitbali.balitravelhealth.ui.theme.BaliTravelHealthTheme
 import com.visitbali.balitravelhealth.ui.theme.Red40
@@ -55,10 +57,14 @@ fun SetupScreenContent(
     onBackClick: () -> Unit = {},
     onSaveProfile: (String, String, String, String) -> Unit = { _, _, _, _ -> }
 ) {
+    val countryPlaceholder = stringResource(R.string.setup_placeholder_country)
+    val dobPlaceholder = stringResource(R.string.setup_placeholder_dob)
+    val genderPlaceholder = stringResource(R.string.setup_placeholder_gender)
+
     var name by remember { mutableStateOf("") }
-    var country by remember { mutableStateOf("Country of Residence") }
-    var dob by remember { mutableStateOf("Date of Birth") }
-    var gender by remember { mutableStateOf("Gender") }
+    var country by remember { mutableStateOf(countryPlaceholder) }
+    var dob by remember { mutableStateOf(dobPlaceholder) }
+    var gender by remember { mutableStateOf(genderPlaceholder) }
 
     var showDatePicker by remember { mutableStateOf(false) }
     var showGenderDialog by remember { mutableStateOf(false) }
@@ -80,11 +86,10 @@ fun SetupScreenContent(
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
-    // Logic: Form is complete if all fields are filled with something other than placeholders
     val isFormComplete = name.isNotBlank() && 
-            country != "Country of Residence" && 
-            dob != "Date of Birth" && 
-            gender != "Gender"
+            country != countryPlaceholder && 
+            dob != dobPlaceholder && 
+            gender != genderPlaceholder
 
     Column(
         modifier = Modifier
@@ -93,20 +98,20 @@ fun SetupScreenContent(
             .padding(horizontal = 24.dp)
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
-                    focusManager.clearFocus() // Dismiss keyboard/focus when tapping anywhere else
+                    focusManager.clearFocus()
                 })
             }
     ) {
         Spacer(modifier = Modifier.height(24.dp))
         
         IconButton(onClick = onBackClick) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.Black)
+            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back), tint = Color.Black)
         }
         
         Spacer(modifier = Modifier.height(24.dp))
         
         Text(
-            text = "Let's Get Started",
+            text = stringResource(R.string.setup_title),
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Serif,
@@ -116,7 +121,7 @@ fun SetupScreenContent(
         Spacer(modifier = Modifier.height(8.dp))
         
         Text(
-            text = "Before that, we need to know some of your information. This information will be used to maximize your personal experience.",
+            text = stringResource(R.string.setup_subtitle),
             fontSize = 12.sp,
             color = Color.Gray,
             lineHeight = 20.sp
@@ -124,7 +129,7 @@ fun SetupScreenContent(
         
         Spacer(modifier = Modifier.height(32.dp))
         
-        SetupTextField(value = name, onValueChange = { if (it.length <= 64) name = it }, placeholder = "Your Name")
+        SetupTextField(value = name, onValueChange = { if (it.length <= 64) name = it }, placeholder = stringResource(R.string.setup_hint_name))
         
         Spacer(modifier = Modifier.height(16.dp))
         
@@ -158,7 +163,7 @@ fun SetupScreenContent(
             onClick = {
                 onSaveProfile(name, country, dob, gender)
             },
-            enabled = isFormComplete, // Logic: Disable button if form is not complete
+            enabled = isFormComplete,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .height(56.dp)
@@ -183,7 +188,7 @@ fun SetupScreenContent(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Next",
+                    text = stringResource(R.string.btn_next),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -204,10 +209,10 @@ fun SetupScreenContent(
                         dob = formatter.format(Date(it))
                     }
                     showDatePicker = false
-                }) { Text("OK") }
+                }) { Text(stringResource(R.string.btn_ok)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text("Cancel") }
+                TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.btn_cancel)) }
             }
         ) {
             DatePicker(state = datePickerState)
@@ -218,10 +223,12 @@ fun SetupScreenContent(
     if (showGenderDialog) {
         AlertDialog(
             onDismissRequest = { showGenderDialog = false },
-            title = { Text("Select Gender", color = Color.Black) },
+            title = { Text(stringResource(R.string.setup_dialog_select_gender), color = Color.Black) },
             text = {
+                val male = stringResource(R.string.setup_gender_male)
+                val female = stringResource(R.string.setup_gender_female)
                 Column {
-                    listOf("Male", "Female").forEach { item ->
+                    listOf(male, female).forEach { item ->
                         Row(
                             Modifier
                                 .fillMaxWidth()
@@ -249,7 +256,7 @@ fun SetupScreenContent(
             },
             confirmButton = {
                 TextButton(onClick = { showGenderDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.btn_cancel))
                 }
             }
         )
@@ -293,7 +300,7 @@ fun SetupDropdown(label: String, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(label, color = if (label.contains("Select") || label.contains("Date of Birth") || label.contains("Gender") || label.contains("Country")) Color.DarkGray else Color.Black)
+            Text(label, color = Color.Black)
             Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = null, tint = Color.Black)
         }
     }

@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -90,7 +91,7 @@ fun NurseDetailScreen(
                         if (uiState.isLoading) {
                             CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                         } else {
-                            Text("Book", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.nurse_detail_btn_book), color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -134,7 +135,7 @@ fun NurseDetailScreen(
                             .size(40.dp)
                             .background(Color.White.copy(alpha = 0.7f), CircleShape),
                     ) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
+                        Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.cd_close))
                     }
                 }
 
@@ -161,8 +162,8 @@ fun NurseDetailScreen(
 
                     DetailActionRow(
                         icon = Icons.Default.CalendarToday,
-                        title = "Schedule",
-                        subtitle = selectedDate?.format(displayFormatter) ?: "Tap to select date",
+                        title = stringResource(R.string.label_schedule),
+                        subtitle = selectedDate?.format(displayFormatter) ?: stringResource(R.string.nurse_detail_tap_to_select_date),
                         onClick = { showDatePicker = true },
                     )
                 }
@@ -188,8 +189,8 @@ fun NurseDetailScreen(
                 showFailureDialog = false
                 viewModel.resetBookingState()
             },
-            title = { Text("Appointment Failed") },
-            text = { Text(uiState.bookingError ?: "Unknown error occurred") },
+            title = { Text(stringResource(R.string.nurse_detail_booking_failed_title)) },
+            text = { Text(uiState.bookingError ?: stringResource(R.string.error_unknown)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -202,7 +203,7 @@ fun NurseDetailScreen(
                             )
                         }
                     },
-                ) { Text("Try again") }
+                ) { Text(stringResource(R.string.nurse_detail_btn_try_again)) }
             },
             dismissButton = {
                 TextButton(
@@ -210,7 +211,7 @@ fun NurseDetailScreen(
                         showFailureDialog = false
                         viewModel.resetBookingState()
                     },
-                ) { Text("Cancel") }
+                ) { Text(stringResource(R.string.btn_cancel)) }
             },
         )
     }
@@ -256,7 +257,7 @@ fun BookingSuccessScreen() {
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "Appointment\nConfirmed",
+                text = stringResource(R.string.nurse_detail_booking_confirmed),
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -338,9 +339,9 @@ private fun NurseDatePickerModal(
                     }
                 },
                 enabled = datePickerState.selectedDateMillis != null,
-            ) { Text("OK") }
+            ) { Text(stringResource(R.string.btn_ok)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.btn_cancel)) } },
     ) {
         DatePicker(state = datePickerState)
     }
