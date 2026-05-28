@@ -5,12 +5,19 @@
 
 # Retrofit
 -keep class retrofit2.** { *; }
--keepclasseswithmembers class * {
+-keepattributes Signature, Exceptions
+-keepclasseswithmembers interface * {
     @retrofit2.http.* <methods>;
 }
 -dontwarn retrofit2.**
 
-# OkHttp
+# Kotlin Coroutines (Fix for suspend functions)
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keepclassmembers class * extends kotlin.coroutines.jvm.internal.ContinuationImpl {
+    <fields>;
+}
+-dontwarn kotlinx.coroutines.**
 -keep class okhttp3.** { *; }
 -keep interface okhttp3.** { *; }
 -dontwarn okhttp3.**
