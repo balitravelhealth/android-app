@@ -22,7 +22,7 @@ Bali Travel Health helps travellers stay safe before, during, and after their tr
 
 ## Screenshots
 
-![Bali Travel Health App](https://balihealth.sgp1.cdn.digitaloceanspaces.com/Bali%20Travel%20Health%20App.png)
+![Bali Travel Health App](https://balihealth.sgp1.cdn.digitaloceanspaces.com/BTH%20Android.png)
 
 ---
 
